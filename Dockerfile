@@ -20,7 +20,7 @@ RUN pip install poetry
 RUN poetry config installer.max-workers 10
 
 # now install source
-RUN poetry install .
+RUN poetry install
 
 # test base image
 FROM python:3.11.8 AS testing
