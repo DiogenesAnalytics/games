@@ -1,5 +1,5 @@
 # jupyter base image
-FROM jupyter/scipy-notebook:lab-4.1.5 AS jupyter
+FROM quay.io/jupyter/scipy-notebook:lab-4.1.5 AS jupyter
 
 # first turn off git safe.directory
 RUN git config --global safe.directory '*'
