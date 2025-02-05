@@ -25,6 +25,15 @@ RUN poetry install
 # test base image
 FROM python:3.11.8 AS testing
 
+# install pyenv
+RUN curl https://pyenv.run | bash
+
+# Configure pyenv in the shell
+ENV PATH="/root/.pyenv/bin:$PATH"
+RUN echo 'eval "$(pyenv init --path)"' >> ~/.bashrc \
+    && echo 'eval "$(pyenv init -)"' >> ~/.bashrc \
+    && echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+
 # turn off poetry venv
 ENV POETRY_VIRTUALENVS_CREATE=false
 

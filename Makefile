@@ -1,6 +1,7 @@
 .PHONY: all build-jupyter build-tests jupyter pause address containers \
         list-containers stop-containers restart-containers lint tests pytest \
-        deptry isort black flake8 mypy shell clear-nb clean
+        deptry isort black flake8 mypy shell clear-nb clean check-act \
+        install-act run-act-tests
 
 # Usage:
 # make                    # just alias to containers command
@@ -177,11 +178,11 @@ deptry:
 
 # run isort in docker container
 isort:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} isort src/ tests/
+	@ ${DCKRTST} ${DCKRIMG_TESTS} isort .
 
 # run black in docker container
 black:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} black src/ tests/
+	@ ${DCKRTST} ${DCKRIMG_TESTS} black .
 
 # run flake8 in docker container
 flake8:
@@ -189,7 +190,7 @@ flake8:
 
 # run mypy in docker container
 mypy:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} mypy src/ tests/
+	@ ${DCKRTST} ${DCKRIMG_TESTS} mypy .
 
 # create interactive shell in docker container
 shell:
@@ -202,3 +203,24 @@ clear-nb:
 
 # cleanup everything
 clean: clear-nb
+
+# install act command
+install-act:
+	@ echo "Installing act..."
+	@ curl --proto '=https' --tlsv1.2 -sSf \
+	  "https://raw.githubusercontent.com/nektos/act/master/install.sh" | \
+	  sudo bash -s -- -b ./bin && \
+	sudo mv ./bin/act /usr/local/bin/
+	@ echo "act installed and moved to /usr/local/bin"
+
+# check if act is installed
+check-act:
+	@ command -v act >/dev/null 2>&1 && \
+	{ echo "✅ 'act' is installed!"; } || \
+	{ echo "❌ Command 'act' is not installed. Please install it with: "\
+	"'make install-act' 💻🔧"; exit 1; }
+
+# run github action tests locally
+run-act-tests: check-act
+	@ echo "Running GitHub Action Tests locally..."
+	act -j run-tests $(ARGS)
