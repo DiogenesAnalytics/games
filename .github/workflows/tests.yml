@@ -28,6 +28,17 @@ jobs:
       if: ${{ env.SKIP_BUILD != 'true' }}
       run: make build-tests
 
-    - name: Run Tests
+    - name: Get Python Version from Docker Container
+      id: get_python_version
+      run: |
+        python_version=$(make test-py-version)
+        echo "Python version in container: $python_version"
+        echo "default_python_version=$python_version" >> $GITHUB_ENV
+
+    - name: Run Tests with Default ${{ env.default_python_version }}
+      run: |
+        make nox ARGS="-s test" NOTTY=true USE_VOL=false USE_USR=false
+
+    - name: Run Tests for Multiple Python Versions
       run: |
         make nox ARGS="-s setup_python test" NOTTY=true USE_VOL=false USE_USR=false
