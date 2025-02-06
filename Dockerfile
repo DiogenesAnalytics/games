@@ -28,16 +28,15 @@ FROM python:3.11.8 AS testing
 # install pyenv
 RUN curl https://pyenv.run | bash
 
-# add pyenv to the PATH for all shells (login, interactive, non-interactive)
-ENV PATH="/root/.pyenv/bin:$PATH"
-RUN echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bash_profile \
-    && echo 'eval "$(pyenv init --path)"' >> ~/.bash_profile \
-    && echo 'eval "$(pyenv init -)"' >> ~/.bash_profile \
-    && echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile \
-    && echo 'export PATH="$HOME/.pyenv/shims:$PATH"' >> ~/.bash_profile
+# set PYENV environment variables
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
-# ensure the shell loads these for non-interactive shells
-RUN echo 'if [ -n "$PS1" ]; then . ~/.bash_profile; fi' >> ~/.bashrc
+# ensure pyenv is initialized properly
+RUN echo 'export PYENV_ROOT="/root/.pyenv"' >> ~/.bashrc \
+    && echo 'export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"' >> ~/.bashrc \
+    && echo 'eval "$(pyenv init --path)"' >> ~/.bashrc \
+    && echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 
 # turn off poetry venv
 ENV POETRY_VIRTUALENVS_CREATE=false
@@ -56,3 +55,9 @@ RUN poetry config installer.max-workers 10
 
 # now install development dependencies
 RUN poetry install --with dev -C .
+
+# final stage to run nox setup
+FROM testing AS final
+
+# Run nox to set up Python versions
+RUN nox -s setup_python
