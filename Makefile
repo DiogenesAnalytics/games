@@ -1,7 +1,7 @@
 .PHONY: all build-jupyter build-tests jupyter pause address containers \
         list-containers stop-containers restart-containers lint tests pytest \
         deptry isort black flake8 mypy nox shell clear-nb clean check-act \
-        install-act run-act-tests
+        install-act run-act-tests test-py-version
 
 # Usage:
 # make                    # just alias to containers command
@@ -26,6 +26,7 @@
 # make shell              # create interactive shell in docker container
 # make clear-nb           # simply clears Jupyter notebook output
 # make clean              # combines all clearing commands into one
+# make test-py-version    # print default python test version
 
 
 ################################################################################
@@ -229,3 +230,7 @@ check-act:
 run-act-tests: check-act
 	@ echo "Running GitHub Action Tests locally..."
 	act -j run-tests $(ARGS)
+
+# get default python version
+test-py-version:
+	@ ${DCKRTST} ${DCKRIMG_TESTS} python --version
