@@ -31,7 +31,7 @@ jobs:
     - name: Get Python Version from Docker Container
       id: get_python_version
       run: |
-        python_version=$(make test-py-version)
+        python_version=$(make test-py-version NOTTY=true USE_VOL=false USE_USR=false)
         echo "Python version in container: $python_version"
         echo "default_python_version=$python_version" >> $GITHUB_ENV
 
