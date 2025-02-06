@@ -94,6 +94,27 @@ def install_lint_deps(session: nox.Session, deps: Optional[List[str]] = None) ->
     session.install(*deps_to_install)
 
 
+def run_linting_tools(session: nox.Session) -> None:
+    """Run all linting tools."""
+    session.run("flake8")
+    session.run("black", ".")
+    session.run("isort", ".")
+    session.run("mypy", ".")
+    session.run("deptry", "src/")
+
+
+def install_and_run_tests(session: nox.Session) -> None:
+    """Helper function to install dependencies and run tests."""
+    # Install Nox if not already installed
+    session.install("nox")
+
+    # Install test dependencies
+    session.install("pytest")
+
+    # Run the tests (assuming pytest is used)
+    session.run("pytest")
+
+
 @nox.session()
 def setup_python(session: nox.Session) -> None:
     """Install required Python versions using pyenv."""
@@ -116,30 +137,36 @@ def setup_python(session: nox.Session) -> None:
     session.run("pyenv", "versions", external=True)
 
 
-@nox.session(python=PROJECT_PYTHON_VERSIONS)
-def test(session: nox.Session) -> None:
-    """Run tests using pytest."""
-    # Install Nox if not already installed
-    session.install("nox")
-
-    # Install test dependencies
-    session.install("pytest")
-
-    # Run the tests (assuming pytest is used)
-    session.run("pytest")
+@nox.session()
+def test_default_version(session: nox.Session) -> None:
+    """Run tests using pytest on the default Python version."""
+    install_and_run_tests(session)
 
 
 @nox.session(python=PROJECT_PYTHON_VERSIONS)
-def lint(session: nox.Session) -> None:
-    """Run all linting tools."""
+def test_all_versions(session: nox.Session) -> None:
+    """Run tests using pytest on all specified Python versions."""
+    install_and_run_tests(session)
+
+
+@nox.session()
+def lint_default_version(session: nox.Session) -> None:
+    """Run all linting tools on the default Python version."""
+    # install all lint deps
     install_lint_deps(session)
 
-    # Run all linting tools
-    session.run("flake8")
-    session.run("black", ".")
-    session.run("isort", ".")
-    session.run("mypy", ".")
-    session.run("deptry", "src/")
+    # run all linting tools
+    run_linting_tools(session)
+
+
+@nox.session(python=PROJECT_PYTHON_VERSIONS)
+def lint_all_versions(session: nox.Session) -> None:
+    """Run all linting tools on all specified Python version."""
+    # install all lint deps
+    install_lint_deps(session)
+
+    # run all linting tools
+    run_linting_tools(session)
 
 
 @nox.session(python=PROJECT_PYTHON_VERSIONS)
