@@ -1,7 +1,7 @@
 """Nox sessions."""
 
 import re
-import subprocess
+import shutil
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -79,17 +79,6 @@ def get_python_versions_from_toml() -> List[str]:
 PROJECT_PYTHON_VERSIONS = get_python_versions_from_toml()
 
 
-def install_python_version(version: str) -> None:
-    """Installs the given Python version using pyenv."""
-    try:
-        subprocess.run(["pyenv", "install", version], check=True)
-    except subprocess.CalledProcessError as e:
-        # Raise the error again with a custom message
-        raise RuntimeError(
-            f"Could not install Python version {version} using pyenv."
-        ) from e
-
-
 def install_lint_deps(session: nox.Session, deps: Optional[List[str]] = None) -> None:
     """Install specified linting dependencies (or all if not provided)."""
     # defaults
@@ -106,10 +95,25 @@ def install_lint_deps(session: nox.Session, deps: Optional[List[str]] = None) ->
 
 
 @nox.session()
-def setup(session: nox.Session) -> None:
+def setup_python(session: nox.Session) -> None:
     """Install required Python versions using pyenv."""
+    # find pyenv using shutil.which
+    pyenv_path = shutil.which("pyenv")
+    if not pyenv_path:
+        session.error("pyenv is not installed or not in PATH. Please install pyenv.")
+
+    # install python versions
     for vers in PROJECT_PYTHON_VERSIONS:
-        install_python_version(vers)
+        session.run("pyenv", "install", "--skip-existing", vers, external=True)
+
+    # rehash pyenv to update shims
+    session.run("pyenv", "rehash", external=True)
+
+    # set global versions (optional, depending on your workflow)
+    session.run("pyenv", "global", *PROJECT_PYTHON_VERSIONS, external=True)
+
+    # verify installation
+    session.run("pyenv", "versions", external=True)
 
 
 @nox.session(python=PROJECT_PYTHON_VERSIONS)
