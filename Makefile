@@ -1,4 +1,4 @@
-.PHONY: all build-jupyter build-tests jupyter pause address containers \
+.PHONY: all build-jupyter build-tests build-final jupyter pause address containers \
         list-containers stop-containers restart-containers lint tests pytest \
         deptry isort black flake8 mypy nox shell clear-nb clean install-act \
         check-act run-act-tests test-py-version
@@ -7,6 +7,7 @@
 # make                    # just alias to containers command
 # make build-jupyter      # build jupyter docker image
 # make build-tests        # build testing docker image
+# make build-final        # build final docker image
 # make jupyter            # startup Docker container running Jupyter server
 # make pause              # pause PSECS (to pause between commands)
 # make address            # get Docker container address/port
@@ -53,6 +54,7 @@ DCKR_NOCACHE ?= false
 DCKRTTY := $(if $(filter true,$(NOTTY)),-i,-it)
 USE_VOL ?= true
 USE_USR ?= true
+USE_FNL ?= false
 JPTRVOL = $(if $(filter true,$(USE_VOL)),-v ${CURRENTDIR}:/home/jovyan,)
 TESTVOL = $(if $(filter true,$(USE_VOL)),-v ${CURRENTDIR}:${SRCPATH},)
 DCKRUSR = $(if $(filter true,$(USE_USR)),--user $(shell id -u):$(shell id -g),)
@@ -61,6 +63,8 @@ DCKRTST = docker run --rm ${DCKRUSR} ${TESTVOL} ${DCKRTTY}
 DCKRIMG_BASE ?= ghcr.io/diogenesanalytics/games:master
 DCKRIMG_JPYTR ?= ${DCKRIMG_BASE}_jupyter
 DCKRIMG_TESTS ?= ${DCKRIMG_BASE}_testing
+DCKRIMG_FINAL ?= ${DCKRIMG_BASE}_final
+TSTIMG_USED = $(if $(filter true,$(USE_FNL)),${DCKRIMG_FINAL},${DCKRIMG_TESTS})
 
 # jupyter nbconvert vars
 NBCLER = jupyter nbconvert --clear-output --inplace
@@ -94,6 +98,11 @@ build-jupyter:
 build-tests:
 	@ echo "Building Test Docker image..."
 	@ $(call DOCKER_PULL_OR_BUILD,${DCKRIMG_TESTS},testing)
+
+# build-final target to build the final test image with the Nox setup
+build-final:
+	@ echo "Building Final Docker image..."
+	@ $(call DOCKER_PULL_OR_BUILD,${DCKRIMG_FINAL},final)
 
 # launch jupyter notebook development Docker image
 jupyter:
@@ -175,35 +184,35 @@ tests: pytest lint
 
 # run pytest in docker container
 pytest:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} pytest
+	@ ${DCKRTST} ${TSTIMG_USED} pytest
 
 # run deptry in docker container
 deptry:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} deptry src/
+	@ ${DCKRTST} ${TSTIMG_USED} deptry src/
 
 # run isort in docker container
 isort:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} isort .
+	@ ${DCKRTST} ${TSTIMG_USED} isort .
 
 # run black in docker container
 black:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} black .
+	@ ${DCKRTST} ${TSTIMG_USED} black .
 
 # run flake8 in docker container
 flake8:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} flake8
+	@ ${DCKRTST} ${TSTIMG_USED} flake8
 
 # run mypy in docker container
 mypy:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} mypy .
+	@ ${DCKRTST} ${TSTIMG_USED} mypy .
 
 # run nox sessions
 nox:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} nox $(ARGS)
+	@ ${DCKRTST} ${TSTIMG_USED} nox $(ARGS)
 
 # create interactive shell in docker container
 shell:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} bash || true
+	@ ${DCKRTST} ${TSTIMG_USED} bash || true
 
 # remove output from executed notebooks
 clear-nb:
@@ -236,4 +245,4 @@ run-act-tests: check-act
 
 # get default python version
 test-py-version:
-	@ ${DCKRTST} ${DCKRIMG_TESTS} python --version
+	@ ${DCKRTST} ${TSTIMG_USED} python --version
