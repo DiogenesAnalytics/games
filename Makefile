@@ -1,6 +1,6 @@
 .PHONY: all build-jupyter build-tests jupyter pause address containers \
         list-containers stop-containers restart-containers lint tests pytest \
-        deptry isort black flake8 mypy shell clear-nb clean check-act \
+        deptry isort black flake8 mypy nox shell clear-nb clean check-act \
         install-act run-act-tests
 
 # Usage:
@@ -22,6 +22,7 @@
 # make black              # run black in docker container
 # make flake8             # run flake8 in docker container
 # make mypy               # run mypy in docker container
+# make nox                # run nox sessions in docker container
 # make shell              # create interactive shell in docker container
 # make clear-nb           # simply clears Jupyter notebook output
 # make clean              # combines all clearing commands into one
@@ -191,6 +192,10 @@ flake8:
 # run mypy in docker container
 mypy:
 	@ ${DCKRTST} ${DCKRIMG_TESTS} mypy .
+
+# run nox sessions
+nox:
+	@ ${DCKRTST} ${DCKRIMG_TESTS} nox $(ARGS)
 
 # create interactive shell in docker container
 shell:
