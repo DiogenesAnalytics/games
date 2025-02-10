@@ -17,6 +17,9 @@ classifiers = [
 [project.urls]
 Changelog = "https://github.com/DiogenesAnalytics/games/releases"
 
+[tool.poetry.group.dev]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 Pygments = ">=2.10.0"
 black = ">=21.10b0"
