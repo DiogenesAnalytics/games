@@ -1,10 +1,10 @@
-"""Tests for module games.simulation.base."""
+"""Tests for module games.catalog.simulation.base."""
 
 import inspect
 
 import pytest
 
-from games.simulation.base import Simulation
+from games.catalog.simulation.base import Simulation
 
 
 @pytest.mark.abc

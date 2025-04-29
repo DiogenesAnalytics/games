@@ -1,8 +1,8 @@
 """Module contains simulations of chance-based events."""
 
+from games.catalog.simulation.base import Simulation
 from games.primitive.rule.random import RandomChoiceRule
 from games.primitive.state.discrete import ChoiceState
-from games.simulation.base import Simulation
 
 
 class CoinFlip(Simulation):

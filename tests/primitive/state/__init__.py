@@ -1,1 +1,1 @@
-"""This module marks the 'state' subpackage within the 'tests/primitive' package."""
+"""State subpackage within the 'tests/primitive' package."""

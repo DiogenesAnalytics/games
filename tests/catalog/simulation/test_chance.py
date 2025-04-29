@@ -1,9 +1,9 @@
-"""Test suite for 'games.simulation.chance' module."""
+"""Test suite for 'games.catalog.simulation.chance' module."""
 
 import pytest
 
-from games.simulation.chance import CoinFlip
-from games.simulation.chance import DiceRoll
+from games.catalog.simulation.chance import CoinFlip
+from games.catalog.simulation.chance import DiceRoll
 
 
 @pytest.mark.simulation

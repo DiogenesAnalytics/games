@@ -1,1 +1,1 @@
-"""This module marks the 'primitive' subpackage within the 'tests' directory."""
+"""Primitive subpackage within the 'tests' directory."""

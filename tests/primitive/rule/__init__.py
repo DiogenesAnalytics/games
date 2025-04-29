@@ -1,1 +1,1 @@
-"""This module marks the 'rule' subpackage within the 'tests/primitive' package."""
+"""Rule subpackage within the 'tests/primitive' package."""
