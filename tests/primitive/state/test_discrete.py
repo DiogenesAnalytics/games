@@ -1,4 +1,4 @@
-"""Test suite for 'games.primitive.state.discrete' module."""
+"""Test suite for games.primitive.state.discrete module."""
 
 import pytest
 

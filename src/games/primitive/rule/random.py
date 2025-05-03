@@ -1,23 +1,27 @@
 """Module defining rules for random decision-making."""
 
 import random
+from typing import Callable
 
-from games.primitive.rule.base import Rule
+from games.primitive.action.base import Action
+from games.primitive.action.random import RandomChoiceAction
+from games.primitive.rule.base import ExecutorRule
 from games.primitive.state.base import State
 from games.primitive.state.discrete import ChoiceState
 
 
-class RandomChoiceRule(Rule):
+class RandomChoiceRule(ExecutorRule):
     """A rule that randomly selects a valid choice from the state's options."""
 
-    def apply(self, state: State) -> None:
-        """Apply the rule to a given state by randomly choosing a valid option."""
-        if not self.supports_state(state):
-            raise ValueError("This rule cannot be applied to the given state.")
+    def accepts(self, action: Action, state: State) -> bool:
+        """Check if the rule can handle this action and state."""
+        return isinstance(action, RandomChoiceAction) and isinstance(state, ChoiceState)
 
-        new_value = random.choice(list(state.available_values))
-        state.value = new_value
+    def bind_executor(self, action: Action, state: State) -> Callable[[State], None]:
+        """Return an executor that randomly chooses from state's values."""
 
-    def supports_state(self, state: State) -> bool:
-        """Check if the rule is compatible with the given state."""
-        return isinstance(state, ChoiceState)
+        def executor(state: State) -> None:
+            """Executor for randomly choosing from available state values."""
+            state.value = random.choice(list(state.available_values))
+
+        return executor

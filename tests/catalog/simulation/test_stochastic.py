@@ -11,7 +11,7 @@ def test_coinflip_runs() -> None:
     """Test that CoinFlip simulation runs and returns a valid result."""
     sim = CoinFlip()
     sim.step()
-    assert sim.state.value in {"Heads", "Tails"}
+    assert sim.states[0].value in {"Heads", "Tails"}
 
 
 @pytest.mark.simulation
@@ -20,7 +20,7 @@ def test_coinflip_runs_multiple_times() -> None:
     sim = CoinFlip()
     for _ in range(10):  # simulate 10 flips
         sim.step()
-        assert sim.state.value in {"Heads", "Tails"}
+        assert sim.states[0].value in {"Heads", "Tails"}
 
 
 @pytest.mark.simulation
@@ -38,5 +38,4 @@ def test_diceroll_states_integrity() -> None:
     sim = DiceRoll(num_dice=3, num_sides=6)
     initial_states = sim.states
     sim.step()
-    # verify the states object is not changed unexpectedly
     assert len(sim.states) == len(initial_states)
