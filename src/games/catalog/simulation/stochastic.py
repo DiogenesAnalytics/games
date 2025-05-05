@@ -50,3 +50,21 @@ class DiceRoll(Simulation):
     def is_done(self) -> bool:
         """Indicate if the simulation is done (in this case, never done)."""
         return False
+
+
+class CardDraw(Simulation):
+    """A simple simulation of a card draw using atomic states and rules."""
+
+    def _register_components(self) -> None:
+        """Set up the card draw simulation with state, rule, and actor."""
+        self.states = [
+            ChoiceState(
+                set(f"{rank}{suit}" for rank in "A23456789TJQK" for suit in "♠♥♦♣")
+            )
+        ]
+        self.rules = [RandomChoiceRule()]
+        self.actors = [SimpleNonPlayer(RandomChoiceAction)]
+
+    def is_done(self) -> bool:
+        """Card draw simulation never ends automatically."""
+        return False
