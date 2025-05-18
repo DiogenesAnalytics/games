@@ -2,20 +2,57 @@
 
 from abc import ABC
 from abc import abstractmethod
-from typing import Callable
+from typing import Any
+from typing import List
 from typing import Optional
+from typing import Tuple
 
-from games.primitive.state.base import State
+from games.primitive.state.mapping import StateDiff
+from games.primitive.state.mapping import View
 
 
 class Action(ABC):
     """Abstract base class for all actions."""
 
-    def __init__(self) -> None:
-        """Initialize executor function to default None value."""
-        self._executor: Optional[Callable[[State], None]] = None
+    def __init__(
+        self, actor_id: str, view: View, diff: Optional[StateDiff] = None
+    ) -> None:
+        """Store Actor info and initialize state."""
+        self.actor_id = actor_id
+        self.view = view
+        self._diff = diff if diff is not None else StateDiff({})
         self._valid: bool = False
         self._invalidated: bool = False
+
+    # accessors for StateDiff
+    @property
+    def diff(self) -> StateDiff:
+        """Return the StateDiff object."""
+        return self._diff
+
+    def set(self, key: str, value: Any) -> None:
+        """Set a key-value pair in the StateDiff."""
+        self.diff[key] = value
+
+    def get(self, key: str) -> Any:
+        """Get a value for a given key from the StateDiff."""
+        return self.diff[key]
+
+    def items(self) -> List[Tuple[str, Any]]:
+        """Return all key-value pairs in the StateDiff."""
+        return list(self.diff.items())
+
+    def __getitem__(self, key: str) -> Any:
+        """Allow direct access to the StateDiff using indexing."""
+        return self.diff[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """Allow direct modification of the StateDiff using indexing."""
+        self.diff[key] = value
+
+    def __contains__(self, key: str) -> bool:
+        """Check if a key exists in the StateDiff."""
+        return key in self.diff
 
     @property
     def is_valid(self) -> bool:
@@ -23,41 +60,15 @@ class Action(ABC):
         return self._valid
 
     def invalidate(self) -> None:
-        """Mark the action as invalid and remove executor."""
+        """Mark the action as invalid (permanent)."""
         if not self._invalidated:
             self._valid = False
-            self._executor = None
             self._invalidated = True
 
     def validate(self) -> None:
-        """Validate the action (mark as valid), but skip if invalidated."""
+        """Mark the action as valid unless already invalidated."""
         if not self._invalidated:
             self._valid = True
-
-    @property
-    def is_resolved(self) -> bool:
-        """Check whether the action is validated and has an executor."""
-        return self._valid and self._executor is not None
-
-    @property
-    def apply(self) -> Callable[[State], None]:
-        """Return the executor function that applies the action."""
-        if not self.is_resolved:
-            raise NotImplementedError("Action has not been resolved by any Rule.")
-        assert self._executor is not None  # for mypy and safety
-        return self._executor
-
-    @property
-    def executor(self) -> Optional[Callable[[State], None]]:
-        """Access the underlying executor function, if set."""
-        return self._executor
-
-    @executor.setter
-    def executor(self, func: Callable[[State], None]) -> None:
-        """Set the function that will execute the action on the state."""
-        if not callable(func):
-            raise TypeError("Executor must be a callable.")
-        self._executor = func
 
     @abstractmethod
     def describe(self) -> str:
@@ -66,14 +77,24 @@ class Action(ABC):
 
     def __repr__(self) -> str:
         """Return a string representation of the action."""
+        # format description str in a compact way
         try:
             desc = self.describe()
             summary = (desc[:47] + "...") if len(desc) > 50 else desc
         except Exception:
             summary = "N/A"
 
+        # format StateDiff in a compact way
+        try:
+            diff_items = list(self.diff._data.items())
+            diff_summary = "{...}" if len(diff_items) > 3 else str(self.diff._data)
+        except Exception:
+            diff_summary = "N/A"
+
         return (
             f"<{self.__class__.__name__}: "
+            f"actor={self.actor_id}, "
             f"valid={self.is_valid}, "
+            f"diff={diff_summary}, "
             f"desc={summary!r}>"
         )

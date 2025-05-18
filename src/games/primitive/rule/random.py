@@ -5,12 +5,12 @@ from typing import Callable
 
 from games.primitive.action.base import Action
 from games.primitive.action.random import RandomChoiceAction
-from games.primitive.rule.base import ExecutorRule
+from games.primitive.rule.base import Rule
 from games.primitive.state.base import State
 from games.primitive.state.discrete import ChoiceState
 
 
-class RandomChoiceRule(ExecutorRule):
+class RandomChoiceRule(Rule):
     """A rule that randomly selects a valid choice from the state's options."""
 
     def accepts(self, action: Action, state: State) -> bool:

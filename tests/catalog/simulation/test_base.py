@@ -24,7 +24,7 @@ class DummySimulation(Simulation):
     def _register_components(self) -> None:
         """Register a single actor, a single state, and provided rules."""
         self.actors.append(self._custom_actor)
-        self.states.append(self._custom_state)
+        self.states["dummy_state"] = self._custom_state
         self.rules.extend(self._custom_rules)
 
     def is_done(self) -> bool:

@@ -12,7 +12,7 @@ class CoinFlip(Simulation):
 
     def _register_components(self) -> None:
         """Set up the coin flip simulation with state, rule, and actor."""
-        self.states = [ChoiceState({"Heads", "Tails"})]
+        self.states = {"coin": ChoiceState({"Heads", "Tails"})}
         self.rules = [RandomChoiceRule()]
         self.actors = [SimpleNonPlayer(RandomChoiceAction)]
 
@@ -41,9 +41,10 @@ class DiceRoll(Simulation):
 
     def _register_components(self) -> None:
         """Setup the dice roll states, rules, and actors."""
-        self.states = [
-            ChoiceState(set(range(1, self.num_sides + 1))) for _ in range(self.num_dice)
-        ]
+        self.states = {
+            f"die_{i}": ChoiceState(set(range(1, self.num_sides + 1)))
+            for i in range(self.num_dice)
+        }
         self.rules = [RandomChoiceRule()]
         self.actors = [SimpleNonPlayer(RandomChoiceAction)]
 
@@ -57,11 +58,11 @@ class CardDraw(Simulation):
 
     def _register_components(self) -> None:
         """Set up the card draw simulation with state, rule, and actor."""
-        self.states = [
-            ChoiceState(
-                set(f"{rank}{suit}" for rank in "A23456789TJQK" for suit in "♠♥♦♣")
+        self.states = {
+            "deck": ChoiceState(
+                {f"{rank}{suit}" for rank in "A23456789TJQK" for suit in "♠♥♦♣"}
             )
-        ]
+        }
         self.rules = [RandomChoiceRule()]
         self.actors = [SimpleNonPlayer(RandomChoiceAction)]
 

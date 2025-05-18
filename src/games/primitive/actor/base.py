@@ -5,15 +5,19 @@ from abc import abstractmethod
 from typing import Type
 
 from games.primitive.action.base import Action
-from games.primitive.state.base import State
+from games.primitive.state.mapping import View
 
 
 class Actor(ABC):
     """Abstract base class for all entities capable of generating actions."""
 
+    def __init__(self, actor_id: str) -> None:
+        """Initialize the actor with a unique identifier."""
+        self.id = actor_id
+
     @abstractmethod
-    def decide(self, state: State) -> Action:
-        """Decide on an action to take based on the current state."""
+    def decide(self, view: View) -> Action:
+        """Decide on an action to take based on the current state view."""
         pass
 
 
@@ -34,10 +38,12 @@ class NonPlayer(Actor, ABC):
 class SimpleNonPlayer(NonPlayer):
     """A non-player actor that always returns the same action."""
 
-    def __init__(self, action_type: Type[Action]) -> None:
-        """Initialize with a single action type to always use."""
+    def __init__(self, actor_id: str, action_type: Type[Action]) -> None:
+        """Initialize with an ID and a fixed action type."""
+        super().__init__(actor_id)
         self.action_type = action_type
 
-    def decide(self, state: State) -> Action:
+    def decide(self, view: View) -> Action:
         """Always instantiate and return the same action type."""
+        # Use the view to make a decision
         return self.action_type()

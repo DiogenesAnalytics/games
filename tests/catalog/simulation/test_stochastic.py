@@ -12,7 +12,7 @@ def test_coinflip_runs() -> None:
     """Test that CoinFlip simulation runs and returns a valid result."""
     sim = CoinFlip()
     sim.step()
-    assert sim.states[0].value in {"Heads", "Tails"}
+    assert sim.states["coin"].value in {"Heads", "Tails"}
 
 
 @pytest.mark.simulation
@@ -21,7 +21,7 @@ def test_coinflip_runs_multiple_times() -> None:
     sim = CoinFlip()
     for _ in range(10):  # simulate 10 flips
         sim.step()
-        assert sim.states[0].value in {"Heads", "Tails"}
+        assert sim.states["coin"].value in {"Heads", "Tails"}
 
 
 @pytest.mark.simulation
@@ -29,7 +29,7 @@ def test_diceroll_runs() -> None:
     """Test that DiceRoll simulation runs and each die has a valid result."""
     sim = DiceRoll(num_dice=3, num_sides=6)
     sim.step()
-    for state in sim.states:
+    for state in sim.states.values():
         assert 1 <= state.value <= 6
 
 
@@ -47,7 +47,7 @@ def test_carddraw_runs() -> None:
     """Test that CardDraw simulation runs and returns a valid card."""
     sim = CardDraw()
     sim.step()
-    assert sim.states[0].value in sim.states[0].available_values
+    assert sim.states["deck"].value in sim.states["deck"].available_values
 
 
 @pytest.mark.simulation
@@ -58,14 +58,14 @@ def test_carddraw_runs_multiple_times() -> None:
 
     for _ in range(20):
         sim.step()
-        drawn_cards.add(sim.states[0].value)
+        drawn_cards.add(sim.states["deck"].value)
 
-    assert drawn_cards.issubset(sim.states[0].available_values)
+    assert drawn_cards.issubset(sim.states["deck"].available_values)
 
 
 @pytest.mark.simulation
 def test_carddraw_deck_completeness() -> None:
     """Ensure that the full deck contains exactly 52 unique cards."""
     sim = CardDraw()
-    assert len(sim.states[0].available_values) == 52
-    assert len(set(sim.states[0].available_values)) == 52
+    assert len(sim.states["deck"].available_values) == 52
+    assert len(set(sim.states["deck"].available_values)) == 52

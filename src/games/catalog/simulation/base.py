@@ -6,48 +6,44 @@ from typing import List
 
 from games.primitive.actor.base import Actor
 from games.primitive.rule.base import Rule
-from games.primitive.state.base import State
+from games.primitive.state.manager import StateManager
 
 
 class Simulation(ABC):
     """Abstract Base Class for simulations that evolve over time."""
 
     def __init__(self) -> None:
-        """Initialize the simulation by preparing internal components."""
-        self.states: List[State] = []
-        self.rules: List[Rule] = []
+        """Initialize the simulation with a state manager, actors, and rules."""
+        self.state_manager = StateManager()
         self.actors: List[Actor] = []
+        self.rules: List[Rule] = []
         self._register_components()
 
     @abstractmethod
     def _register_components(self) -> None:
-        """Set up states, rules, and actors."""
+        """Set up states, rules, actors, and access control."""
         pass
 
     def _run_cycle(self) -> None:
-        """Run one actor–action–rule–state resolution cycle."""
-        # loop over actors
+        """Run one full actor–view–action–rule–state cycle."""
         for actor in self.actors:
-            # loop over states
-            for state in self.states:
-                # get actor's decision
-                action = actor.decide(state)
+            view = self.state_manager.get_view(actor.id)
+            action = actor.decide(view)
 
-                # loop over all rules
-                for rule in self.rules:
-                    # check action against rules
-                    if rule.accepts(action, state):
-                        # update action with executor if necessary
-                        rule.apply(action, state)
-                        break
+            # apply rules
+            for rule in self.rules:
+                rule.process(action)
+                if not action.is_valid:
+                    break
 
-                if action.is_resolved:
-                    action.apply(state)
-                else:
-                    raise RuntimeError(f"No rule could resolve action: {action}")
+            # update state
+            if action.is_valid:
+                self.state_manager.apply_diff(action.diff)
+            else:
+                raise RuntimeError(f"Invalid action from actor {actor.id}: {action}")
 
     def step(self) -> None:
-        """Advance the simulation by one step using actor–action–rule–state logic."""
+        """Advance the simulation by one step."""
         self._run_cycle()
 
     @abstractmethod
