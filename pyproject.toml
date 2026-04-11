@@ -5,7 +5,8 @@ description = "Python library for interactive, rules-based games."
 authors = [
   { name = "Diogenes Analytics", email = "diogenesanalytics@gmail.com" }
 ]
-license = "Proprietary"
+license = "LicenseRef-Proprietary"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
