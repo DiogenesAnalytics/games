@@ -1,20 +1,24 @@
 """Checkerboard background implementation for grid-based boards."""
 
-from typing import Any, Sequence
+from typing import Any
+
 import numpy as np
 
+from ..types import CellColor
 from .base import Background
 
 
-class CheckerboardBackground:
+class CheckerboardBackground(Background):
     """Alternating light/dark board background."""
 
-    def __init__(self, light=(1.0, 0.9, 0.8), dark=(0.6, 0.4, 0.2)) -> None:
+    def __init__(
+        self, light: CellColor = (1.0, 0.9, 0.8), dark: CellColor = (0.6, 0.4, 0.2)
+    ) -> None:
         """Initialize checkerboard colors."""
         self.light = light
         self.dark = dark
 
-    def draw(self, ax, size: int) -> None:
+    def draw(self, ax: Any, size: int) -> None:
         """Draw checkerboard background."""
         board = np.zeros((size, size, 3))
 

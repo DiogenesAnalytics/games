@@ -1,37 +1,35 @@
-"""Chess-specific cell rendering functions."""
-"""
-Chess cell rendering using python-chess symbols.
-"""
+"""Chess-specific renderable cell definitions."""
 
-from typing import Any
 import chess
 
 
 _piece_unicode = {
-    "P": "♟", "N": "♞", "B": "♝", "R": "♜", "Q": "♛", "K": "♚",
-    "p": "♟", "n": "♞", "b": "♝", "r": "♜", "q": "♛", "k": "♚",
+    "P": "♟",
+    "N": "♞",
+    "B": "♝",
+    "R": "♜",
+    "Q": "♛",
+    "K": "♚",
+    "p": "♟",
+    "n": "♞",
+    "b": "♝",
+    "r": "♜",
+    "q": "♛",
+    "k": "♚",
 }
 
 
-def render_chess_cell(ax: Any, r: int, c: int, value: chess.Piece) -> None:
-    """
-    Render a chess piece at a given board coordinate.
+class ChessPiece:
+    """Renderable representation of a chess piece for visualization."""
 
-    value is expected to be a python-chess Piece (not int encoding).
-    """
+    def __init__(self, piece: chess.Piece) -> None:
+        """Initialize a renderable wrapper around a python-chess Piece."""
+        self.piece = piece
 
-    if value is None:
-        return
+    def render_symbol(self) -> str:
+        """Return glyph based directly on python-chess symbol."""
+        return _piece_unicode[self.piece.symbol()]
 
-    symbol = _piece_unicode[value.symbol()]
-    color = "white" if value.color else "black"
-
-    ax.text(
-        c + 0.5,
-        r + 0.5,
-        symbol,
-        ha="center",
-        va="center",
-        fontsize=22,
-        color=color,
-    )
+    def render_color(self) -> str:
+        """Return rendering color for the piece."""
+        return "white" if self.piece.color == chess.WHITE else "black"

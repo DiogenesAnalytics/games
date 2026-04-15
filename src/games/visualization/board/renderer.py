@@ -1,11 +1,17 @@
 """Core board rendering engine."""
 
-import matplotlib.pyplot as plt
-import numpy as np
-from abc import ABC, abstractmethod
-from typing import Any, Optional, Sequence
+from abc import ABC
+from abc import abstractmethod
+from typing import Any
+from typing import Optional
+from typing import Sequence
 
-from .types import Grid, Overlay
+import matplotlib.pyplot as plt
+
+from .background.base import Background
+from .protocol import CellValue
+from .types import Grid
+from .types import Overlay
 
 
 class BoardRenderer(ABC):
@@ -24,12 +30,15 @@ class BoardRenderer(ABC):
 
 
 class MatplotlibBoardRenderer(BoardRenderer):
-    """Matplotlib implementation of board renderer."""
+    """Matplotlib-based implementation of board rendering."""
 
-    def __init__(self, background, render_cell, show_grid: bool = False):
-        """Initialize renderer with background and cell strategy."""
+    def __init__(
+        self,
+        background: Background,
+        show_grid: bool = False,
+    ) -> None:
+        """Initialize renderer."""
         self.background = background
-        self.render_cell = render_cell
         self.show_grid = show_grid
 
     def render(
@@ -39,8 +48,8 @@ class MatplotlibBoardRenderer(BoardRenderer):
         title: str = "",
         overlays: Optional[Sequence[Overlay]] = None,
     ) -> None:
-        """Render a grid using matplotlib."""
-        size = grid.shape[0]
+        """Render a board grid using matplotlib."""
+        size: int = grid.shape[0]
         fig, ax = plt.subplots(figsize=(6, 6))
 
         self.background.draw(ax, size)
@@ -48,8 +57,8 @@ class MatplotlibBoardRenderer(BoardRenderer):
         self._draw_grid(ax, size)
 
         if overlays:
-            for o in overlays:
-                o(ax)
+            for overlay in overlays:
+                overlay(ax)
 
         ax.set_xticks([])
         ax.set_yticks([])
@@ -63,14 +72,25 @@ class MatplotlibBoardRenderer(BoardRenderer):
         plt.show()
 
     def _draw_cells(self, ax: Any, grid: Grid) -> None:
-        """Render all grid cells."""
-        size = grid.shape[0]
+        """Render all non-empty grid cells."""
+        size: int = grid.shape[0]
 
         for r in range(size):
             for c in range(size):
-                value = grid[r, c]
-                if value is not None:
-                    self.render_cell(ax, r, c, value)
+                value: Optional[CellValue] = grid[r, c]
+
+                if value is None:
+                    continue
+
+                ax.text(
+                    c + 0.5,
+                    r + 0.5,
+                    value.render_symbol(),
+                    ha="center",
+                    va="center",
+                    color=value.render_color(),
+                    fontsize=16,
+                )
 
     def _draw_grid(self, ax: Any, size: int) -> None:
         """Draw optional grid lines."""

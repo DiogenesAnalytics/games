@@ -22,6 +22,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "state: state tests")
     config.addinivalue_line("markers", "actor: actor tests")
     config.addinivalue_line("markers", "rule: rule tests")
+    config.addinivalue_line("markers", "adapter: adapter tests")
 
 
 class MockAction(Action):
