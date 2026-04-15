@@ -10,6 +10,7 @@ license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 dependencies = [
+    "matplotlib (>=3)",
     "numpy (>=2)",
     "python-chess>=1.999",
     "sgfmill>=1.1.1"
@@ -61,6 +62,10 @@ source = ["games", "tests"]
 [tool.coverage.report]
 show_missing = true
 fail_under = 100
+
+[tool.deptry.package_module_name_map]
+python-chess = ["chess"]
+matplotlib = ["matplotlib"]
 
 [tool.isort]
 profile = "black"
