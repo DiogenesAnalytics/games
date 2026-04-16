@@ -6,9 +6,9 @@ from typing import Any
 
 
 class Background(ABC):
-    """Abstract background rendering strategy."""
+    """Defines board geometry and visual background."""
 
     @abstractmethod
     def draw(self, ax: Any, size: int) -> None:
-        """Render background onto axis."""
-        raise NotImplementedError
+        """Draw the board background."""
+        ...

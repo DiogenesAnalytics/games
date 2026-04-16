@@ -12,6 +12,7 @@ import pytest
 from pytest import MonkeyPatch
 
 from games.visualization.board.background.base import Background
+from games.visualization.board.geometry.base import Geometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
 from games.visualization.board.types import Grid
 
@@ -47,6 +48,19 @@ class BackgroundSpy(Background):
         self.calls.append(size)
 
 
+class GeometrySpy(Geometry):
+    """Test double for Geometry that records coordinate lookups."""
+
+    def __init__(self) -> None:
+        """Initialize empty call log."""
+        self.calls: List[Tuple[int, int]] = []
+
+    def cell_position(self, r: int, c: int) -> Tuple[float, float]:
+        """Record coordinate lookup and return centered position."""
+        self.calls.append((r, c))
+        return c + 0.5, r + 0.5
+
+
 @pytest.fixture
 def empty_grid() -> Grid:
     """Provide a small empty grid for renderer tests."""
@@ -69,6 +83,12 @@ def background_spy() -> BackgroundSpy:
 
 
 @pytest.fixture
+def geometry_spy() -> GeometrySpy:
+    """Provide a GeometrySpy instance."""
+    return GeometrySpy()
+
+
+@pytest.fixture
 def text_spy(monkeypatch: MonkeyPatch) -> List[Tuple[Tuple[Any, ...], Dict[str, Any]]]:
     """Capture calls to matplotlib Axes.text."""
     calls: List[Tuple[Tuple[Any, ...], Dict[str, Any]]] = []
@@ -85,13 +105,15 @@ def text_spy(monkeypatch: MonkeyPatch) -> List[Tuple[Tuple[Any, ...], Dict[str, 
 @pytest.fixture
 def make_renderer(
     background_spy: BackgroundSpy,
+    geometry_spy: GeometrySpy,
 ) -> RendererFactory:
-    """Provide a factory for constructing MatplotlibBoardRenderer instances."""
+    """Factory for constructing MatplotlibBoardRenderer instances."""
 
     def _make(show_grid: bool = False) -> MatplotlibBoardRenderer:
-        """Construct a renderer with injected dependencies."""
+        """Create renderer with injected test doubles."""
         return MatplotlibBoardRenderer(
             background=background_spy,
+            geometry=geometry_spy,
             show_grid=show_grid,
         )
 
@@ -144,17 +166,14 @@ def test_renderer_calls_background_once(
 def test_renderer_cell_coordinates(
     make_renderer: RendererFactory,
     grid_with_cells: Grid,
-    text_spy: List[Tuple[Tuple[Any, ...], Dict[str, Any]]],
+    geometry_spy: GeometrySpy,
 ) -> None:
-    """Renderer should place text at cell centers."""
+    """Renderer should delegate coordinate mapping to Geometry."""
     renderer = make_renderer()
-
     renderer.render(grid_with_cells)
 
-    positions = [(args[0], args[1]) for args, _ in text_spy]
-
-    assert (0 + 0.5, 0 + 0.5) in positions  # i.e. (0,0)
-    assert (2 + 0.5, 2 + 0.5) in positions  # i.e. (2,2)
+    assert (0, 0) in geometry_spy.calls
+    assert (2, 2) in geometry_spy.calls
 
 
 @pytest.mark.renderer

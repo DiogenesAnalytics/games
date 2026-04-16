@@ -9,6 +9,7 @@ from typing import Sequence
 import matplotlib.pyplot as plt
 
 from .background.base import Background
+from .geometry.base import Geometry
 from .protocol import CellValue
 from .types import Grid
 from .types import Overlay
@@ -35,10 +36,12 @@ class MatplotlibBoardRenderer(BoardRenderer):
     def __init__(
         self,
         background: Background,
+        geometry: Geometry,
         show_grid: bool = False,
     ) -> None:
-        """Initialize renderer."""
+        """Initialize with background, geometry system, and display options."""
         self.background = background
+        self.geometry = geometry
         self.show_grid = show_grid
 
     def render(
@@ -82,9 +85,11 @@ class MatplotlibBoardRenderer(BoardRenderer):
                 if value is None:
                     continue
 
+                x, y = self.geometry.cell_position(r, c)
+
                 ax.text(
-                    c + 0.5,
-                    r + 0.5,
+                    x,
+                    y,
                     value.render_symbol(),
                     ha="center",
                     va="center",
