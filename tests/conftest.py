@@ -26,7 +26,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "renderer: renderer tests")
     config.addinivalue_line("markers", "background: background tests")
     config.addinivalue_line("markers", "geometry: geometry tests")
-    config.addinivalue_line("markers", "integration: integration tests")
+    config.addinivalue_line("markers", "scene: scene tests")
 
 
 class MockAction(Action):
