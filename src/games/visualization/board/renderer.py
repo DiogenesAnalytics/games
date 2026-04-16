@@ -25,7 +25,7 @@ class BoardRenderer(ABC):
         *,
         title: str = "",
         overlays: Optional[Sequence[Overlay]] = None,
-    ) -> None:
+    ) -> Any:
         """Render a grid state."""
         raise NotImplementedError
 
@@ -50,7 +50,8 @@ class MatplotlibBoardRenderer(BoardRenderer):
         *,
         title: str = "",
         overlays: Optional[Sequence[Overlay]] = None,
-    ) -> None:
+        return_ax: bool = False,
+    ) -> Any:
         """Render a board grid using matplotlib."""
         size: int = grid.shape[0]
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -71,6 +72,9 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
         if title:
             ax.set_title(title)
+
+        if return_ax:
+            return ax
 
         plt.show()
 
