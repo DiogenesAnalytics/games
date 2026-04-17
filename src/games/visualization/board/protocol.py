@@ -24,3 +24,16 @@ class CellValue(Protocol):
 
     def render_color(self) -> str:
         """Return rendering color (as matplotlib-compatible string)."""
+
+    def draw(
+        self,
+        ax: Any,
+        x: float,
+        y: float,
+        board_size: int,
+    ) -> bool:
+        """Draw custom representation.
+
+        Return True if handled by cell.
+        Return False to let renderer fallback to text.
+        """

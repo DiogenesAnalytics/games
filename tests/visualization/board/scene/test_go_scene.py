@@ -5,12 +5,13 @@ from typing import Any
 import pytest
 from sgfmill import boards
 
+from games.visualization.board.cells.go import StoneCircle
 from games.visualization.board.scene.go import GoScene
 
 
 @pytest.mark.scene
 def test_go_scene_renders_without_error() -> None:
-    """Test execute full render pipeline."""
+    """Test should execute full render pipeline."""
     board = boards.Board(9)
     scene = GoScene(board)
 
@@ -20,8 +21,8 @@ def test_go_scene_renders_without_error() -> None:
 
 
 @pytest.mark.scene
-def test_go_scene_renders_stone() -> None:
-    """Test render at least one stone when present."""
+def test_go_scene_renders_stone_patch() -> None:
+    """Test that Go stones are rendered as Circle patches with stone tag."""
     board = boards.Board(9)
     board.play(3, 3, "b")
 
@@ -29,12 +30,14 @@ def test_go_scene_renders_stone() -> None:
 
     ax: Any = scene.render(return_ax=True)
 
-    assert len(ax.texts) >= 1
+    stone_patches = [p for p in ax.patches if isinstance(p, StoneCircle)]
+
+    assert len(stone_patches) >= 1
 
 
 @pytest.mark.scene
 def test_go_scene_identity_geometry() -> None:
-    """Test preserve identity coordinate mapping."""
+    """Test preserve identity coordinate mapping for Go stones."""
     board = boards.Board(9)
     board.play(3, 3, "b")
 
@@ -42,6 +45,8 @@ def test_go_scene_identity_geometry() -> None:
 
     ax: Any = scene.render(return_ax=True)
 
-    positions = {t.get_position() for t in ax.texts}
+    stone_patches = [p for p in ax.patches if isinstance(p, StoneCircle)]
 
-    assert (3.0, 3.0) in positions
+    centers = {p.center for p in stone_patches}
+
+    assert (3.0, 3.0) in centers

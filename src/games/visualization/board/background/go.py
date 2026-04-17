@@ -43,27 +43,37 @@ def default_star_points(size: int) -> List[Tuple[int, int]]:
 class GoBackground(Background):
     """Go board background with grid lines and star points."""
 
-    def __init__(self, color: str = "#d2b48c") -> None:
+    def __init__(self, color: str = "#D9A86C") -> None:
         """Initialize Go board background."""
         self.color = color
 
     def draw(self, ax: Any, size: int) -> None:
         """Render the Go board background onto a matplotlib axis."""
+        self._configure_axes(ax, size)
         self._draw_background(ax)
         self._draw_grid(ax, size)
         self._draw_star_points(ax, size)
 
+    def _configure_axes(self, ax: Any, size: int) -> None:
+        """Lock coordinate system to Go board geometry contract."""
+        ax.set_xlim(-0.5, size - 0.5)
+        ax.set_ylim(-0.5, size - 0.5)
+        ax.set_aspect("equal")
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_autoscale_on(False)
+
     def _draw_background(self, ax: Any) -> None:
-        """Set the board background color."""
+        """Set board background color."""
         ax.set_facecolor(self.color)
 
     def _draw_grid(self, ax: Any, size: int) -> None:
-        """Draw the Go grid lines."""
+        """Draw Go grid lines."""
         for i in range(size):
-            ax.plot([0, size - 1], [i, i], linewidth=1)
-            ax.plot([i, i], [0, size - 1], linewidth=1)
+            ax.plot([0, size - 1], [i, i], color="black", linewidth=1)
+            ax.plot([i, i], [0, size - 1], color="black", linewidth=1)
 
     def _draw_star_points(self, ax: Any, size: int) -> None:
-        """Draw star points (hoshi) for standard Go board sizes."""
+        """Draw star points (hoshi)."""
         for r, c in default_star_points(size):
-            ax.add_patch(Circle((c, r), 0.12))
+            ax.add_patch(Circle((c, r), 0.12, color="black", zorder=3))

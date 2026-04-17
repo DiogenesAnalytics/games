@@ -39,7 +39,7 @@ class MatplotlibBoardRenderer(BoardRenderer):
         geometry: Geometry,
         show_grid: bool = False,
     ) -> None:
-        """Initialize with background, geometry system, and display options."""
+        """Initialize renderer with board background and geometry."""
         self.background = background
         self.geometry = geometry
         self.show_grid = show_grid
@@ -54,7 +54,7 @@ class MatplotlibBoardRenderer(BoardRenderer):
     ) -> Any:
         """Render a board grid using matplotlib."""
         size: int = grid.shape[0]
-        fig, ax = plt.subplots(figsize=(6, 6))
+        _, ax = plt.subplots(figsize=(6, 6))
 
         self.background.draw(ax, size)
         self._draw_cells(ax, grid)
@@ -63,12 +63,6 @@ class MatplotlibBoardRenderer(BoardRenderer):
         if overlays:
             for overlay in overlays:
                 overlay(ax)
-
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_xlim(0, size)
-        ax.set_ylim(0, size)
-        ax.set_aspect("equal")
 
         if title:
             ax.set_title(title)
@@ -91,6 +85,10 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
                 x, y = self.geometry.cell_position(r, c)
 
+                if hasattr(value, "draw"):
+                    if value.draw(ax, x, y, size):
+                        continue
+
                 ax.text(
                     x,
                     y,
@@ -99,10 +97,11 @@ class MatplotlibBoardRenderer(BoardRenderer):
                     va="center",
                     color=value.render_color(),
                     fontsize=16,
+                    zorder=3,
                 )
 
     def _draw_grid(self, ax: Any, size: int) -> None:
-        """Draw optional grid lines."""
+        """Draw optional renderer-level grid lines."""
         if not self.show_grid:
             return
 
