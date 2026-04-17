@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from .background.base import Background
 from .geometry.base import Geometry
 from .protocol import CellValue
+from .scene.base import RenderSpec
 from .types import Grid
 from .types import Overlay
 
@@ -23,8 +24,10 @@ class BoardRenderer(ABC):
         self,
         grid: Grid,
         *,
+        spec: Optional[RenderSpec] = None,
         title: str = "",
         overlays: Optional[Sequence[Overlay]] = None,
+        return_ax: bool = False,
     ) -> Any:
         """Render a grid state."""
         raise NotImplementedError
@@ -48,13 +51,20 @@ class MatplotlibBoardRenderer(BoardRenderer):
         self,
         grid: Grid,
         *,
+        spec: Optional[RenderSpec] = None,
         title: str = "",
         overlays: Optional[Sequence[Overlay]] = None,
         return_ax: bool = False,
     ) -> Any:
         """Render a board grid using matplotlib."""
         size: int = grid.shape[0]
-        _, ax = plt.subplots(figsize=(6, 6))
+
+        spec = spec or RenderSpec()
+
+        _, ax = plt.subplots(
+            figsize=spec.figsize,
+            dpi=spec.dpi,
+        )
 
         self.background.draw(ax, size)
         self._draw_cells(ax, grid)
@@ -66,6 +76,9 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
         if title:
             ax.set_title(title)
+
+        if not spec.show_axes:
+            ax.axis("off")
 
         if return_ax:
             return ax
@@ -85,9 +98,10 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
                 x, y = self.geometry.cell_position(r, c)
 
-                if hasattr(value, "draw"):
-                    if value.draw(ax, x, y, size):
-                        continue
+                draw_fn = getattr(value, "draw", None)
+
+                if callable(draw_fn) and draw_fn(ax, x, y, size):
+                    continue
 
                 ax.text(
                     x,
@@ -96,7 +110,7 @@ class MatplotlibBoardRenderer(BoardRenderer):
                     ha="center",
                     va="center",
                     color=value.render_color(),
-                    fontsize=16,
+                    fontsize=max(10, int(240 / size)),
                     zorder=3,
                 )
 

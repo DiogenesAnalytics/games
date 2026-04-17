@@ -27,7 +27,7 @@ def test_chess_adapter_single_piece() -> None:
     assert cell is not None
 
     assert cell.render_symbol() is not None
-    assert cell.render_color() == "white"
+    assert cell.piece_color() == "white"
 
 
 @pytest.mark.adapter
@@ -67,7 +67,7 @@ def test_chess_adapter_multiple_pieces() -> None:
         assert cell is not None
 
         assert cell.render_symbol() is not None
-        assert cell.render_color() in {"white", "black"}
+        assert cell.piece_color() in {"white", "black"}
 
 
 @pytest.mark.adapter
@@ -82,16 +82,16 @@ def test_chess_adapter_fen_position() -> None:
     r, c = divmod(chess.E5, 8)
     cell = grid[r, c]
     assert cell is not None
-    assert cell.render_color() == "black"
+    assert cell.piece_color() == "black"
 
     # e4 white pawn
     r, c = divmod(chess.E4, 8)
     cell = grid[r, c]
     assert cell is not None
-    assert cell.render_color() == "white"
+    assert cell.piece_color() == "white"
 
     # f1 white rook
     r, c = divmod(chess.F1, 8)
     cell = grid[r, c]
     assert cell is not None
-    assert cell.render_color() == "white"
+    assert cell.piece_color() == "white"

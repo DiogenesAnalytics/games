@@ -20,10 +20,13 @@ class CellValue(Protocol):
     """Renderable object that can be displayed in a grid cell."""
 
     def render_symbol(self) -> str:
-        """Return a human-visible symbol for rendering (e.g. ♟, ●)."""
+        """Return glyph used to represent the object."""
+
+    def piece_color(self) -> str:
+        """Return logical game-side or semantic color."""
 
     def render_color(self) -> str:
-        """Return rendering color (as matplotlib-compatible string)."""
+        """Return display color used for rendering."""
 
     def draw(
         self,

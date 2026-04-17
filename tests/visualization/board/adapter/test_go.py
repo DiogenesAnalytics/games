@@ -35,7 +35,7 @@ def test_go_adapter_single_stone(empty_go_board: boards.Board) -> None:
     cell = grid[3, 3]
     assert cell is not None
     assert cell.render_symbol() == "●"
-    assert cell.render_color() == "black"
+    assert cell.piece_color() == "black"
 
 
 @pytest.mark.adapter
@@ -72,4 +72,4 @@ def test_go_adapter_multiple_stones(empty_go_board: boards.Board) -> None:
 
         assert cell is not None
         assert cell.render_symbol() == "●"
-        assert cell.render_color() == ("black" if color == "b" else "white")
+        assert cell.piece_color() == ("black" if color == "b" else "white")

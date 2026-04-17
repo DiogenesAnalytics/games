@@ -1,6 +1,7 @@
 """Full rendering pipeline for chess visualization."""
 
 from typing import Any
+from typing import Optional
 
 import chess
 
@@ -10,14 +11,17 @@ from games.visualization.board.background.chess import ChessBackground
 from games.visualization.board.geometry.chess import ChessGeometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
 
+from .base import RenderSpec
 from .base import Scene
 
 
 class ChessScene(Scene):
     """High-level chess rendering orchestration."""
 
-    def __init__(self, board: chess.Board) -> None:
+    def __init__(self, board: chess.Board, spec: Optional[RenderSpec] = None) -> None:
         """Initialize chess scene."""
+        super().__init__(spec=spec)
+
         self.board = board
 
         self.renderer = MatplotlibBoardRenderer(
@@ -30,4 +34,8 @@ class ChessScene(Scene):
         wrapper = ChessBoardWrapper(self.board)
         grid = chess_board_to_grid(wrapper)
 
-        return self.renderer.render(grid, return_ax=return_ax)
+        return self.renderer.render(
+            grid,
+            spec=self.spec,
+            return_ax=return_ax,
+        )

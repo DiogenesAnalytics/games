@@ -22,9 +22,15 @@ class GoStone:
         """Return stone symbol."""
         return "●"
 
+    def piece_color(self) -> str:
+        """Return logical stone color."""
+        return self.color
+
     def render_color(self) -> str:
         """Return display color."""
-        return self.color
+        if self.piece_color() == "white":
+            return "#f4f2ec"
+        return "#111111"
 
     def draw(
         self,
@@ -36,13 +42,14 @@ class GoStone:
         """Draw stone scaled to board size."""
         radius: float = 0.42
 
-        edgecolor = "black" if self.color == "white" else None
+        edgecolor = "#111111" if self.piece_color() == "white" else None
 
         circle = StoneCircle(
             (x, y),
             radius,
-            facecolor=self.color,
+            facecolor=self.render_color(),
             edgecolor=edgecolor,
+            linewidth=1.0,
             zorder=3,
         )
 

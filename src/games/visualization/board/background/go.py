@@ -8,6 +8,7 @@ from typing import List
 from typing import Tuple
 
 from matplotlib.patches import Circle
+from matplotlib.patches import Rectangle
 
 from .base import Background
 
@@ -22,7 +23,7 @@ _STAR_POINTS: Dict[int, Tuple[Tuple[int, int], ...]] = {
         (9, 15),
         (15, 3),
         (15, 9),
-        (15, 9),
+        (15, 15),
     ),
     13: (
         (3, 3),
@@ -36,8 +37,8 @@ _STAR_POINTS: Dict[int, Tuple[Tuple[int, int], ...]] = {
 
 
 def default_star_points(size: int) -> List[Tuple[int, int]]:
-    """Return standard star-point coordinates for a Go board size."""
-    return list(_STAR_POINTS.get(size, ()))
+    """Return deduplicated star-point coordinates for a Go board size."""
+    return list(dict.fromkeys(_STAR_POINTS.get(size, ())))
 
 
 class GoBackground(Background):
@@ -50,7 +51,7 @@ class GoBackground(Background):
     def draw(self, ax: Any, size: int) -> None:
         """Render the Go board background onto a matplotlib axis."""
         self._configure_axes(ax, size)
-        self._draw_background(ax)
+        self._draw_background(ax, size)
         self._draw_grid(ax, size)
         self._draw_star_points(ax, size)
 
@@ -63,17 +64,46 @@ class GoBackground(Background):
         ax.set_yticks([])
         ax.set_autoscale_on(False)
 
-    def _draw_background(self, ax: Any) -> None:
-        """Set board background color."""
+    def _draw_background(self, ax: Any, size: int) -> None:
+        """Draw solid background as a stable matplotlib patch."""
         ax.set_facecolor(self.color)
+
+        rect = Rectangle(
+            (-0.5, -0.5),
+            size,
+            size,
+            facecolor=self.color,
+            edgecolor="none",
+            zorder=-1,  # Always behind everything
+        )
+        ax.add_patch(rect)
 
     def _draw_grid(self, ax: Any, size: int) -> None:
         """Draw Go grid lines."""
         for i in range(size):
-            ax.plot([0, size - 1], [i, i], color="black", linewidth=1)
-            ax.plot([i, i], [0, size - 1], color="black", linewidth=1)
+            ax.plot(
+                [0, size - 1],
+                [i, i],
+                color="black",
+                linewidth=1,
+                zorder=1,
+            )
+            ax.plot(
+                [i, i],
+                [0, size - 1],
+                color="black",
+                linewidth=1,
+                zorder=1,
+            )
 
     def _draw_star_points(self, ax: Any, size: int) -> None:
         """Draw star points (hoshi)."""
         for r, c in default_star_points(size):
-            ax.add_patch(Circle((c, r), 0.12, color="black", zorder=3))
+            ax.add_patch(
+                Circle(
+                    (c, r),
+                    0.12,
+                    color="black",
+                    zorder=2,
+                )
+            )

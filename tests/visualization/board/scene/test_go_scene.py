@@ -6,6 +6,7 @@ import pytest
 from sgfmill import boards
 
 from games.visualization.board.cells.go import StoneCircle
+from games.visualization.board.scene.base import RenderSpec
 from games.visualization.board.scene.go import GoScene
 
 
@@ -50,3 +51,24 @@ def test_go_scene_identity_geometry() -> None:
     centers = {p.center for p in stone_patches}
 
     assert (3.0, 3.0) in centers
+
+
+def test_go_scene_respects_render_spec() -> None:
+    """Test RenderSpec propagates to renderer and matplotlib figure."""
+    board: boards.Board = boards.Board(9)
+
+    spec: RenderSpec = RenderSpec(
+        figsize=(10.0, 10.0),
+        dpi=250,
+        show_axes=False,
+    )
+
+    scene: GoScene = GoScene(board, spec=spec)
+
+    ax: Any = scene.render(return_ax=True)
+
+    fig = ax.figure
+
+    assert tuple(fig.get_size_inches()) == spec.figsize
+    assert fig.dpi == spec.dpi
+    assert ax.axison is spec.show_axes
