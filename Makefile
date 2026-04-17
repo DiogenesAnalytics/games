@@ -217,7 +217,7 @@ shell:
 # remove output from executed notebooks
 clear-nb:
 	@ echo "Removing all output from Jupyter notebooks."
-	@ ${DCKRRUN} ${DCKRIMG_JPYTR} ${NBCLER} ${NOTEBOOKS}
+	@ ${DCKRTST} ${DCKRIMG_JPYTR} ${NBCLER} ${NOTEBOOKS}
 
 # cleanup everything
 clean: clear-nb
