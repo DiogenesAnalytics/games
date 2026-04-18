@@ -2,18 +2,31 @@
 
 from abc import ABC
 from abc import abstractmethod
+from dataclasses import dataclass
 from typing import Any
 from typing import Optional
 from typing import Sequence
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 
 from .background.base import Background
 from .geometry.base import Geometry
 from .protocol import CellValue
-from .scene.base import RenderSpec
 from .types import Grid
 from .types import Overlay
+
+
+@dataclass(frozen=True)
+class RenderSpec:
+    """Configuration for matplotlib rendering output."""
+
+    figsize: Tuple[float, float] = (6.0, 6.0)
+    dpi: int = 150
+    show_axes: bool = False
+    subtitle: Optional[str] = None
+    subtitle_y: float = 0.98
+    subtitle_fontsize: int = 12
 
 
 class BoardRenderer(ABC):
@@ -61,7 +74,7 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
         spec = spec or RenderSpec()
 
-        _, ax = plt.subplots(
+        fig, ax = plt.subplots(
             figsize=spec.figsize,
             dpi=spec.dpi,
         )
@@ -76,6 +89,13 @@ class MatplotlibBoardRenderer(BoardRenderer):
 
         if title:
             ax.set_title(title)
+
+        if spec.subtitle:
+            fig.suptitle(
+                spec.subtitle,
+                y=spec.subtitle_y,
+                fontsize=spec.subtitle_fontsize,
+            )
 
         if not spec.show_axes:
             ax.axis("off")

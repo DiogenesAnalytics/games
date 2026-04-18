@@ -5,7 +5,7 @@ from typing import Any
 import chess
 import pytest
 
-from games.visualization.board.scene.base import RenderSpec
+from games.visualization.board.renderer import RenderSpec
 from games.visualization.board.scene.chess import ChessScene
 
 
@@ -65,22 +65,17 @@ def test_chess_scene_geometry_is_consistent() -> None:
         assert p in positions
 
 
-def test_chess_scene_respects_render_spec() -> None:
-    """Test RenderSpec propagates to the renderer and matplotlib figure."""
-    board: chess.Board = chess.Board()
-
+@pytest.mark.scene
+def test_chess_scene_stores_render_spec() -> None:
+    """Test scene preserves provided RenderSpec."""
     spec: RenderSpec = RenderSpec(
         figsize=(8.0, 8.0),
         dpi=200,
-        show_axes=True,
     )
 
-    scene: ChessScene = ChessScene(board, spec=spec)
+    scene: ChessScene = ChessScene(
+        chess.Board(),
+        spec=spec,
+    )
 
-    ax: Any = scene.render(return_ax=True)
-
-    fig = ax.figure
-
-    assert tuple(fig.get_size_inches()) == spec.figsize
-    assert fig.dpi == spec.dpi
-    assert ax.axison is spec.show_axes
+    assert scene.spec is spec

@@ -1,7 +1,5 @@
 """Go board background implementation."""
 
-from __future__ import annotations
-
 from typing import Any
 from typing import Dict
 from typing import List

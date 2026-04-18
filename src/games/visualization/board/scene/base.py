@@ -2,18 +2,10 @@
 
 from abc import ABC
 from abc import abstractmethod
-from dataclasses import dataclass
 from typing import Any
 from typing import Optional
 
-
-@dataclass(frozen=True)
-class RenderSpec:
-    """Configuration for scene rendering output."""
-
-    figsize: tuple[float, float] = (6.0, 6.0)
-    dpi: int = 150
-    show_axes: bool = False
+from games.visualization.board.renderer import RenderSpec
 
 
 class Scene(ABC):

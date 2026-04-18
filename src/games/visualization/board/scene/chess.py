@@ -10,8 +10,8 @@ from games.visualization.board.adapter.chess import chess_board_to_grid
 from games.visualization.board.background.chess import ChessBackground
 from games.visualization.board.geometry.chess import ChessGeometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
+from games.visualization.board.renderer import RenderSpec
 
-from .base import RenderSpec
 from .base import Scene
 
 

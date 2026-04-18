@@ -14,6 +14,7 @@ from pytest import MonkeyPatch
 from games.visualization.board.background.base import Background
 from games.visualization.board.geometry.base import Geometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
+from games.visualization.board.renderer import RenderSpec
 from games.visualization.board.types import Grid
 
 
@@ -190,3 +191,86 @@ def test_renderer_uses_cell_symbol_and_color(
     for args, kwargs in text_spy:
         assert args[2] == "X"
         assert kwargs["color"] == "white"
+
+
+@pytest.mark.renderer
+def test_renderer_applies_render_spec_figure_settings(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+) -> None:
+    """Renderer should apply RenderSpec figsize and dpi."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    spec: RenderSpec = RenderSpec(
+        figsize=(8.0, 8.0),
+        dpi=220,
+    )
+
+    ax: Any = renderer.render(
+        empty_grid,
+        spec=spec,
+        return_ax=True,
+    )
+
+    fig = ax.figure
+
+    assert tuple(fig.get_size_inches()) == spec.figsize
+    assert fig.dpi == spec.dpi
+
+
+@pytest.mark.renderer
+def test_renderer_applies_subtitle(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Renderer should apply subtitle from RenderSpec."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    calls: List[Dict[str, Any]] = []
+
+    def fake_suptitle(self: Any, text: str, **kwargs: Any) -> None:
+        """Record suptitle call."""
+        calls.append(
+            {
+                "text": text,
+                "kwargs": kwargs,
+            }
+        )
+
+    monkeypatch.setattr("matplotlib.figure.Figure.suptitle", fake_suptitle)
+
+    spec: RenderSpec = RenderSpec(
+        subtitle="Example subtitle",
+        subtitle_y=0.02,
+        subtitle_fontsize=14,
+    )
+
+    renderer.render(
+        empty_grid,
+        spec=spec,
+    )
+
+    assert len(calls) == 1
+    assert calls[0]["text"] == "Example subtitle"
+    assert calls[0]["kwargs"]["y"] == 0.02
+    assert calls[0]["kwargs"]["fontsize"] == 14
+
+
+@pytest.mark.renderer
+def test_renderer_hides_axes_when_configured(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+) -> None:
+    """Renderer should hide axes when show_axes is False."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    spec: RenderSpec = RenderSpec(show_axes=False)
+
+    ax: Any = renderer.render(
+        empty_grid,
+        spec=spec,
+        return_ax=True,
+    )
+
+    assert ax.axison is False

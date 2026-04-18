@@ -10,8 +10,8 @@ from games.visualization.board.adapter.go import go_board_to_grid
 from games.visualization.board.background.go import GoBackground
 from games.visualization.board.geometry.go import GoGeometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
+from games.visualization.board.renderer import RenderSpec
 
-from .base import RenderSpec
 from .base import Scene
 
 
