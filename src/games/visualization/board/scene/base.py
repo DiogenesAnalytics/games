@@ -6,6 +6,7 @@ from typing import Any
 from typing import Optional
 
 from games.visualization.board.renderer import RenderSpec
+from games.visualization.board.renderer import RenderTheme
 
 
 class Scene(ABC):
@@ -16,6 +17,8 @@ class Scene(ABC):
         self.spec: RenderSpec = spec or RenderSpec()
 
     @abstractmethod
-    def render(self, *, return_ax: bool = False) -> Any:
+    def render(
+        self, *, return_ax: bool = False, theme: Optional[RenderTheme] = None
+    ) -> Any:
         """Render the scene."""
         raise NotImplementedError

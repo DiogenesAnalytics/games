@@ -11,6 +11,7 @@ from games.visualization.board.background.chess import ChessBackground
 from games.visualization.board.geometry.chess import ChessGeometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
 from games.visualization.board.renderer import RenderSpec
+from games.visualization.board.renderer import RenderTheme
 
 from .base import Scene
 
@@ -29,7 +30,9 @@ class ChessScene(Scene):
             geometry=ChessGeometry(),
         )
 
-    def render(self, *, return_ax: bool = False) -> Any:
+    def render(
+        self, *, return_ax: bool = False, theme: Optional[RenderTheme] = None
+    ) -> Any:
         """Render chess board state."""
         wrapper = ChessBoardWrapper(self.board)
         grid = chess_board_to_grid(wrapper)
@@ -37,5 +40,6 @@ class ChessScene(Scene):
         return self.renderer.render(
             grid,
             spec=self.spec,
+            theme=theme,
             return_ax=return_ax,
         )

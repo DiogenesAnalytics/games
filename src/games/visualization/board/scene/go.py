@@ -11,6 +11,7 @@ from games.visualization.board.background.go import GoBackground
 from games.visualization.board.geometry.go import GoGeometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
 from games.visualization.board.renderer import RenderSpec
+from games.visualization.board.renderer import RenderTheme
 
 from .base import Scene
 
@@ -29,7 +30,9 @@ class GoScene(Scene):
             geometry=GoGeometry(),
         )
 
-    def render(self, *, return_ax: bool = False) -> Any:
+    def render(
+        self, *, return_ax: bool = False, theme: Optional[RenderTheme] = None
+    ) -> Any:
         """Render Go board state."""
         wrapper = GoBoardWrapper(self.board)
         grid = go_board_to_grid(wrapper)
@@ -37,5 +40,6 @@ class GoScene(Scene):
         return self.renderer.render(
             grid,
             spec=self.spec,
+            theme=theme,
             return_ax=return_ax,
         )

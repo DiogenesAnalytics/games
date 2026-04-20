@@ -15,6 +15,7 @@ from games.visualization.board.background.base import Background
 from games.visualization.board.geometry.base import Geometry
 from games.visualization.board.renderer import MatplotlibBoardRenderer
 from games.visualization.board.renderer import RenderSpec
+from games.visualization.board.renderer import RenderTheme
 from games.visualization.board.types import Grid
 
 
@@ -274,3 +275,85 @@ def test_renderer_hides_axes_when_configured(
     )
 
     assert ax.axison is False
+
+
+@pytest.mark.renderer
+def test_renderer_applies_theme_figure_facecolor(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+) -> None:
+    """Renderer should apply figure facecolor from RenderTheme."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    theme: RenderTheme = RenderTheme(
+        facecolor="#111111",
+    )
+
+    ax: Any = renderer.render(
+        empty_grid,
+        theme=theme,
+        return_ax=True,
+    )
+
+    fig = ax.figure
+
+    assert fig.get_facecolor()[:3] == (17 / 255, 17 / 255, 17 / 255)
+
+
+@pytest.mark.renderer
+def test_renderer_applies_theme_axes_facecolor(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+) -> None:
+    """Test apply axes facecolor from RenderTheme."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    theme: RenderTheme = RenderTheme(
+        axes_facecolor="#222222",
+    )
+
+    ax: Any = renderer.render(
+        empty_grid,
+        theme=theme,
+        return_ax=True,
+    )
+
+    assert ax.get_facecolor()[:3] == (34 / 255, 34 / 255, 34 / 255)
+
+
+@pytest.mark.renderer
+def test_renderer_applies_theme_axes_edgecolor(
+    make_renderer: RendererFactory,
+    empty_grid: Grid,
+) -> None:
+    """Test apply axes edgecolor from RenderTheme."""
+    renderer: MatplotlibBoardRenderer = make_renderer()
+
+    theme: RenderTheme = RenderTheme(
+        axes_edgecolor="#333333",
+    )
+
+    ax: Any = renderer.render(
+        empty_grid,
+        theme=theme,
+        return_ax=True,
+    )
+
+    for spine in ax.spines.values():
+        assert spine.get_edgecolor()[:3] == (
+            51 / 255,
+            51 / 255,
+            51 / 255,
+        )
+
+
+@pytest.mark.renderer
+def test_render_theme_subplot_kwargs() -> None:
+    """Test returns valid subplot kwargs."""
+    theme: RenderTheme = RenderTheme(
+        facecolor="#181818",
+    )
+
+    assert theme.subplot_kwargs() == {
+        "facecolor": "#181818",
+    }
