@@ -1,5 +1,5 @@
 # jupyter base image
-FROM quay.io/jupyter/scipy-notebook:lab-4.1.5 AS jupyter
+FROM ghcr.io/diogenesanalytics/scipy-notebook:master AS jupyter
 
 # first turn off git safe.directory
 RUN git config --global safe.directory '*'
@@ -12,9 +12,6 @@ WORKDIR /usr/local/src/games
 
 # get src
 COPY . .
-
-# get poetry
-RUN pip install poetry
 
 # config max workers
 RUN poetry config installer.max-workers 10
