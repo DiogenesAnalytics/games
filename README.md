@@ -1,7 +1,3 @@
-# Games
-
-Python library for interactive, rules-based games.
-
 [![tests](https://github.com/DiogenesAnalytics/games/workflows/tests/badge.svg)][tests]
 [![Docker](https://github.com/DiogenesAnalytics/games/workflows/docker/badge.svg)][docker]
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
@@ -12,8 +8,10 @@ Python library for interactive, rules-based games.
 [pre-commit]: https://github.com/pre-commit/pre-commit
 [black]: https://github.com/psf/black
 
-## Installation
+# Games
+Python library for interactive, rules-based games.
 
+## Installation
 You can install _Games_ as follows:
 
 ```console
@@ -21,11 +19,9 @@ $ pip install git+https://github.com/DiogenesAnalytics/games
 ```
 
 ## License
-
 Proprietary
 
 ## Credits
-
 This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter] template.
 
 [@cjolowicz]: https://github.com/cjolowicz
