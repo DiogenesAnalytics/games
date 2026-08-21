@@ -184,30 +184,37 @@ tests: pytest lint
 
 # run pytest in docker container
 pytest:
+	@ echo "==> Running pytest..."
 	@ ${DCKRTST} ${TSTIMG_USED} pytest
 
 # run deptry in docker container
 deptry:
+	@ echo "==> Running deptry..."
 	@ ${DCKRTST} ${TSTIMG_USED} deptry src/
 
 # run isort in docker container
 isort:
+	@ echo "==> Running isort..."
 	@ ${DCKRTST} ${TSTIMG_USED} isort .
 
 # run black in docker container
 black:
+	@ echo "==> Running black..."
 	@ ${DCKRTST} ${TSTIMG_USED} black .
 
 # run flake8 in docker container
 flake8:
+	@ echo "==> Running flake8..."
 	@ ${DCKRTST} ${TSTIMG_USED} flake8
 
 # run mypy in docker container
 mypy:
+	@ echo "==> Running mypy..."
 	@ ${DCKRTST} ${TSTIMG_USED} mypy .
 
 # run nox sessions
 nox:
+	@ echo "==> Running nox..."
 	@ ${DCKRTST} ${TSTIMG_USED} nox $(ARGS)
 
 # create interactive shell in docker container
