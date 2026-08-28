@@ -2,12 +2,10 @@
 
 from typing import List
 from typing import Set
-from typing import Tuple
 
+from games.catalog.simulation.wordle.feedback import Feedback
+from games.catalog.simulation.wordle.feedback import FeedbackInformation
 from games.primitive.state.base import State
-
-
-Feedback = Tuple[Tuple[str, str], ...]
 
 
 class WordleState(State):
@@ -49,6 +47,43 @@ class WordleState(State):
         self._candidates = set(self._solutions)
         self._guesses: List[str] = []
         self._feedback: List[Feedback] = []
+
+    def _matches_information(
+        self,
+        word: str,
+        information: FeedbackInformation,
+    ) -> bool:
+        """Return whether a word satisfies the supplied feedback information.
+
+        Args:
+            word: Candidate solution word to evaluate.
+            information: Information extracted from Wordle feedback.
+
+        Returns:
+            ``True`` if the word satisfies all supplied constraints;
+            otherwise ``False``.
+        """
+        # Required letters at specific positions.
+        for index, letter in information.required.items():
+            if word[index] != letter:
+                return False
+
+        # Letters known to be excluded from specific positions.
+        for index, letters in information.excluded.items():
+            if word[index] in letters:
+                return False
+
+        # Minimum and maximum occurrence constraints.
+        for letter, constraint in information.counts.items():
+            count = word.count(letter)
+
+            if count < constraint.minimum:
+                return False
+
+            if constraint.maximum is not None and count > constraint.maximum:
+                return False
+
+        return True
 
     @property
     def solutions(self) -> Set[str]:

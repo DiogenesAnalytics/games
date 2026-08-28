@@ -4,6 +4,8 @@ from typing import Set
 
 import pytest
 
+from games.catalog.simulation.wordle.feedback import CountConstraint
+from games.catalog.simulation.wordle.feedback import FeedbackInformation
 from games.catalog.simulation.wordle.state import WordleState
 
 
@@ -157,3 +159,121 @@ def test_update_requires_wordle_state(
     """Test that update rejects incompatible state objects."""
     with pytest.raises(TypeError):
         state.update(object())
+
+
+@pytest.mark.wordle
+def test_matches_information_accepts_matching_word() -> None:
+    """Test that a word satisfying all constraints is accepted."""
+    state = WordleState(
+        solutions={"CRANE", "CRATE", "GRAPE"},
+        target="CRANE",
+    )
+
+    information = FeedbackInformation(
+        required={
+            0: "C",
+        },
+        excluded={
+            2: {"R"},
+        },
+        counts={
+            "C": CountConstraint(1, 1),
+        },
+    )
+
+    assert state._matches_information("CRATE", information)
+
+
+@pytest.mark.wordle
+def test_matches_information_rejects_wrong_required_position() -> None:
+    """Test that a word violating a required position is rejected."""
+    state = WordleState(
+        solutions={"CRANE"},
+        target="CRANE",
+    )
+
+    information = FeedbackInformation(
+        required={
+            0: "C",
+        },
+        excluded={},
+        counts={},
+    )
+
+    assert not state._matches_information("GRANE", information)
+
+
+@pytest.mark.wordle
+def test_matches_information_rejects_excluded_position() -> None:
+    """Test that a word containing an excluded letter at a position is rejected."""
+    state = WordleState(
+        solutions={"CRANE"},
+        target="CRANE",
+    )
+
+    information = FeedbackInformation(
+        required={},
+        excluded={
+            1: {"R"},
+        },
+        counts={},
+    )
+
+    assert not state._matches_information("CRANE", information)
+
+
+@pytest.mark.wordle
+def test_matches_information_enforces_minimum_count() -> None:
+    """Test that the minimum letter count is enforced."""
+    state = WordleState(
+        solutions={"CRANE"},
+        target="CRANE",
+    )
+
+    information = FeedbackInformation(
+        required={},
+        excluded={},
+        counts={
+            "R": CountConstraint(2, None),
+        },
+    )
+
+    assert not state._matches_information("CRANE", information)
+
+
+@pytest.mark.wordle
+def test_matches_information_enforces_maximum_count() -> None:
+    """Test that the maximum letter count is enforced."""
+    state = WordleState(
+        solutions={"SHEEP"},
+        target="SHEEP",
+    )
+
+    information = FeedbackInformation(
+        required={},
+        excluded={},
+        counts={
+            "E": CountConstraint(0, 1),
+        },
+    )
+
+    assert not state._matches_information("SHEEP", information)
+
+
+@pytest.mark.wordle
+def test_matches_information_accepts_unbounded_maximum() -> None:
+    """Test that an unbounded maximum allows additional occurrences."""
+    state = WordleState(
+        solutions={"SHEEP"},
+        target="SHEEP",
+    )
+
+    information = FeedbackInformation(
+        required={},
+        excluded={},
+        counts={
+            "E": CountConstraint(1, None),
+        },
+    )
+
+    assert state._matches_information("SHEEP", information)
