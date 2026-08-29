@@ -2,10 +2,13 @@
 
 from typing import List
 from typing import Set
+from typing import Tuple
 
-from games.catalog.simulation.wordle.feedback import Feedback
-from games.catalog.simulation.wordle.feedback import FeedbackInformation
 from games.primitive.state.base import State
+
+from .feedback import Feedback
+from .feedback import FeedbackInformation
+from .feedback import interpret_feedback
 
 
 class WordleState(State):
@@ -131,20 +134,20 @@ class WordleState(State):
             and all(len(guess) == 5 for guess in self._guesses)
         )
 
-    def update(self, value: object) -> None:
-        """Replace this state with another Wordle state.
+    def update(
+        self,
+        value: Tuple[str, Feedback],
+    ) -> None:
+        """Update the state with a new guess and its feedback."""
+        guess, result = value
 
-        Args:
-            value: Wordle state from which to copy the state.
+        self._guesses.append(guess)
+        self._feedback.append(result)
 
-        Raises:
-            TypeError: If ``value`` is not a ``WordleState``.
-        """
-        if not isinstance(value, WordleState):
-            raise TypeError("WordleState can only be updated from WordleState.")
+        information = interpret_feedback(guess, result)
 
-        self._solutions = set(value.solutions)
-        self._target = value.target
-        self._candidates = set(value.candidates)
-        self._guesses = list(value.guesses)
-        self._feedback = list(value.feedback)
+        self._candidates = {
+            word
+            for word in self._candidates
+            if self._matches_information(word, information)
+        }

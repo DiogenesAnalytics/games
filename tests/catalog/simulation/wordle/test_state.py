@@ -6,6 +6,8 @@ import pytest
 
 from games.catalog.simulation.wordle.feedback import CountConstraint
 from games.catalog.simulation.wordle.feedback import FeedbackInformation
+from games.catalog.simulation.wordle.feedback import FeedbackTile
+from games.catalog.simulation.wordle.feedback import feedback
 from games.catalog.simulation.wordle.state import WordleState
 
 
@@ -133,32 +135,34 @@ def test_guess_and_feedback_histories_have_equal_length(
 
 
 @pytest.mark.wordle
-def test_update_copies_state(
+def test_update_records_guess_and_feedback(
     state: WordleState,
-    solutions: Set[str],
 ) -> None:
-    """Test that update copies another Wordle state."""
-    other = WordleState(
-        solutions=solutions,
-        target="STAIN",
+    """Test that update records a guess and its feedback."""
+    result = (
+        FeedbackTile.GREEN,
+        FeedbackTile.YELLOW,
+        FeedbackTile.GRAY,
+        FeedbackTile.GRAY,
+        FeedbackTile.GRAY,
     )
 
-    state.update(other)
+    state.update(("CRANE", result))
 
-    assert state.solutions == other.solutions
-    assert state.target == other.target
-    assert state.candidates == other.candidates
-    assert state.guesses == other.guesses
-    assert state.feedback == other.feedback
+    assert state.guesses == ["CRANE"]
+    assert state.feedback == [result]
 
 
 @pytest.mark.wordle
-def test_update_requires_wordle_state(
+def test_update_reduces_candidates(
     state: WordleState,
 ) -> None:
-    """Test that update rejects incompatible state objects."""
-    with pytest.raises(TypeError):
-        state.update(object())
+    """Test that update removes candidates inconsistent with feedback."""
+    result = feedback(state.target, "STAIN")
+
+    state.update(("STAIN", result))
+
+    assert state.candidates == {"CRANE", "PLANE"}
 
 
 @pytest.mark.wordle
