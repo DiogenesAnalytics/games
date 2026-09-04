@@ -2,7 +2,11 @@
 
 from abc import ABC
 from abc import abstractmethod
+from typing import Dict
 from typing import List
+from typing import Set
+from typing import Tuple
+from uuid import UUID
 
 from games.primitive.actor.base import Actor
 from games.primitive.rule.base import Rule
@@ -14,30 +18,82 @@ class Simulation(ABC):
 
     def __init__(self) -> None:
         """Initialize the simulation by preparing internal components."""
-        self.states: List[State] = []
-        self.rules: List[Rule] = []
-        self.actors: List[Actor] = []
-        self._register_components()
+        self._states: List[State] = []
+        self._rules: List[Rule] = []
+        self._actors: List[Actor] = []
+        self._permissions: Dict[Actor, Set[UUID]] = {}
 
-    @abstractmethod
-    def _register_components(self) -> None:
-        """Set up states, rules, and actors."""
-        pass
+    @property
+    def states(self) -> Tuple[State, ...]:
+        """Return the states registered with the simulation."""
+        return tuple(self._states)
+
+    @property
+    def rules(self) -> Tuple[Rule, ...]:
+        """Return the rules registered with the simulation."""
+        return tuple(self._rules)
+
+    @property
+    def actors(self) -> Tuple[Actor, ...]:
+        """Return the actors registered with the simulation."""
+        return tuple(self._actors)
+
+    def _register_state(self, state: State) -> None:
+        """Register a state with the simulation.
+
+        Args:
+            state: State to register.
+        """
+        self._states.append(state)
+
+    def _register_rule(self, rule: Rule) -> None:
+        """Register a rule with the simulation.
+
+        Args:
+            rule: Rule to register.
+        """
+        self._rules.append(rule)
+
+    def _register_actor(self, actor: Actor) -> None:
+        """Register an actor with the simulation.
+
+        Args:
+            actor: Actor to register.
+        """
+        self._actors.append(actor)
+
+    def authorize(self, actor: Actor, state: State) -> None:
+        """Authorize an actor to interact with a state.
+
+        Args:
+            actor: Actor that should be granted access.
+            state: State the actor may interact with.
+        """
+        self._permissions.setdefault(actor, set()).add(state.id)
+
+    def is_authorized(self, actor: Actor, state: State) -> bool:
+        """Return whether an actor may interact with a state.
+
+        Args:
+            actor: Actor whose authorization should be checked.
+            state: State the actor wants to interact with.
+
+        Returns:
+            ``True`` if the actor is authorized for the state.
+        """
+        return state.id in self._permissions.get(actor, set())
 
     def _run_cycle(self) -> None:
         """Run one actor–action–rule–state resolution cycle."""
-        # loop over actors
-        for actor in self.actors:
-            # loop over states
-            for state in self.states:
-                # get actor's decision
+        for actor in self._actors:
+            for state in self._states:
+                if not self.is_authorized(actor, state):
+                    continue
+
                 action = actor.decide(state)
 
-                # loop over all rules
-                for rule in self.rules:
-                    # check action against rules
+                for rule in self._rules:
                     if rule.accepts(action, state):
-                        # update action with executor if necessary
                         rule.apply(action, state)
                         break
 
@@ -47,7 +103,7 @@ class Simulation(ABC):
                     raise RuntimeError(f"No rule could resolve action: {action}")
 
     def step(self) -> None:
-        """Advance the simulation by one step using actor–action–rule–state logic."""
+        """Advance the simulation by one step."""
         self._run_cycle()
 
     @abstractmethod

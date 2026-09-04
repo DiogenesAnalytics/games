@@ -4,6 +4,8 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Any
 from typing import Set
+from uuid import UUID
+from uuid import uuid4
 
 
 class State(ABC):
@@ -12,7 +14,13 @@ class State(ABC):
     @abstractmethod
     def __init__(self) -> None:
         """Initialize the state with its value."""
+        self._id: UUID = uuid4()
         self._value = None
+
+    @property
+    def id(self) -> UUID:
+        """Return the unique identifier for this state."""
+        return self._id
 
     @abstractmethod
     def reset(self) -> None:

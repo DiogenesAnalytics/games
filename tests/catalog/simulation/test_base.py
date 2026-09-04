@@ -16,16 +16,15 @@ class DummySimulation(Simulation):
 
     def __init__(self, actor: Actor, state: State, rules: list[Rule]) -> None:
         """Initialize the DummySimulation with one actor, one state, and rules."""
-        self._custom_actor = actor
-        self._custom_state = state
-        self._custom_rules = rules
         super().__init__()
 
-    def _register_components(self) -> None:
-        """Register a single actor, a single state, and provided rules."""
-        self.actors.append(self._custom_actor)
-        self.states.append(self._custom_state)
-        self.rules.extend(self._custom_rules)
+        self._register_actor(actor)
+        self._register_state(state)
+
+        for rule in rules:
+            self._register_rule(rule)
+
+        self.authorize(actor, state)
 
     def is_done(self) -> bool:
         """Always return True to prevent continued simulation."""

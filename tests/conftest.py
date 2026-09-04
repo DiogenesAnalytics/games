@@ -43,7 +43,7 @@ class DummyState(State):
 
     def __init__(self) -> None:
         """Initialize the dummy state with a default None value."""
-        self._value = None
+        super().__init__()
 
     def reset(self) -> None:
         """Mock reset method that does nothing."""
