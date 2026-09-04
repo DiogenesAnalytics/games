@@ -134,6 +134,11 @@ class WordleState(State):
             and all(len(guess) == 5 for guess in self._guesses)
         )
 
+    @property
+    def is_terminal(self) -> bool:
+        """Return whether the Wordle game has reached a terminal state."""
+        return self._target in self._guesses or len(self._guesses) >= 6
+
     def update(
         self,
         value: Tuple[str, Feedback],

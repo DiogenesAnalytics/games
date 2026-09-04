@@ -281,3 +281,43 @@ def test_matches_information_accepts_unbounded_maximum() -> None:
     )
 
     assert state._matches_information("SHEEP", information)
+
+
+@pytest.mark.wordle
+def test_initial_state_is_not_terminal() -> None:
+    """A newly initialized state should not be terminal."""
+    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+
+    assert not state.is_terminal
+
+
+@pytest.mark.wordle
+def test_state_is_terminal_when_target_is_guessed() -> None:
+    """A state should be terminal when the target has been guessed."""
+    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+
+    state.update(("CRANE", feedback("CRANE", "CRANE")))
+
+    assert state.is_terminal
+
+
+@pytest.mark.wordle
+def test_state_is_not_terminal_after_fewer_than_six_incorrect_guesses() -> None:
+    """An incorrect guess before the sixth guess should not be terminal."""
+    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+
+    for guess in ["PLANE"]:
+        state.update((guess, feedback("CRANE", guess)))
+
+    assert not state.is_terminal
+
+
+@pytest.mark.wordle
+def test_state_is_terminal_after_six_guesses() -> None:
+    """A state should be terminal after six guesses."""
+    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+
+    for guess in ["PLANE"] * 6:
+        state.update((guess, feedback("CRANE", guess)))
+
+    assert state.is_terminal

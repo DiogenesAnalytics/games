@@ -24,6 +24,11 @@ class State(ABC):
         """Check if the state is valid."""
         pass
 
+    @property
+    def is_terminal(self) -> bool:
+        """Return whether this state is terminal."""
+        return False
+
     @abstractmethod
     def update(self, value: Any) -> None:
         """Update the value of the state."""
