@@ -3,7 +3,7 @@
 import pytest
 
 from games.catalog.simulation.wordle.action import WordleGuess
-from games.catalog.simulation.wordle.player import InteractiveWordlePlayer
+from games.catalog.simulation.wordle.actor import InteractiveWordlePlayer
 from games.primitive.state.base import State
 
 
