@@ -11,7 +11,11 @@ from games.visualization.wordle.terminal import TerminalWordleRenderer
 @pytest.mark.wordle
 def test_render_empty_state() -> None:
     """An empty Wordle state should render six empty rows."""
-    state = WordleState({"CRANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE"},
+        available_guesses={"CRANE"},
+        target="CRANE",
+    )
     renderer = TerminalWordleRenderer()
 
     rendered = renderer.render(state)
@@ -23,7 +27,11 @@ def test_render_empty_state() -> None:
 @pytest.mark.wordle
 def test_render_single_guess() -> None:
     """A single guess should render in the first row."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
     state.update(
         (
             "PLANE",
@@ -59,8 +67,9 @@ def test_render_single_guess() -> None:
 def test_render_multiple_guesses() -> None:
     """Multiple guesses should render in the order they were made."""
     state = WordleState(
-        {"CRANE", "PLANE", "SLATE"},
-        "CRANE",
+        solutions={"CRANE", "PLANE", "SLATE"},
+        available_guesses={"CRANE", "PLANE", "SLATE"},
+        target="CRANE",
     )
     state.update(
         (
@@ -108,7 +117,11 @@ def test_render_multiple_guesses() -> None:
 @pytest.mark.wordle
 def test_render_does_not_modify_state() -> None:
     """Rendering should not modify the Wordle state."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
     state.update(
         (
             "PLANE",
@@ -138,7 +151,11 @@ def test_render_does_not_modify_state() -> None:
 @pytest.mark.wordle
 def test_render_six_guesses() -> None:
     """Six guesses should fill all six rows."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
 
     result = (
         FeedbackTile.GRAY,
@@ -163,7 +180,11 @@ def test_render_six_guesses() -> None:
 @pytest.mark.wordle
 def test_render_yellow_feedback() -> None:
     """Yellow feedback should render with yellow tiles."""
-    state = WordleState({"CRANE", "RECAP"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "RECAP"},
+        available_guesses={"CRANE", "RECAP"},
+        target="CRANE",
+    )
     state.update(
         (
             "RECAP",

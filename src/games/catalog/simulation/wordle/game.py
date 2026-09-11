@@ -15,13 +15,18 @@ class WordleGame(Simulation):
     def __init__(
         self,
         solutions: Set[str],
+        available_guesses: Set[str],
         target: str,
         player: Player,
     ) -> None:
         """Initialize a Wordle game."""
         super().__init__()
 
-        self._state = WordleState(solutions, target)
+        self._state = WordleState(
+            solutions=solutions,
+            available_guesses=available_guesses,
+            target=target,
+        )
         rule = WordleRule()
 
         self._register_state(self._state)

@@ -12,16 +12,14 @@ from games.catalog.simulation.wordle.state import WordleState
 
 
 @pytest.fixture
-def solutions() -> Set[str]:
-    """Return a small solution dictionary for testing."""
-    return {"CRANE", "STAIN", "PLANE"}
-
-
-@pytest.fixture
-def state(solutions: Set[str]) -> WordleState:
+def state(
+    solutions: Set[str],
+    available_guesses: Set[str],
+) -> WordleState:
     """Return a freshly initialized Wordle state."""
     return WordleState(
         solutions=solutions,
+        available_guesses=available_guesses,
         target="CRANE",
     )
 
@@ -42,11 +40,13 @@ def test_initial_state(
 @pytest.mark.wordle
 def test_target_must_be_solution(
     solutions: Set[str],
+    available_guesses: Set[str],
 ) -> None:
     """Test that the target must belong to the solution dictionary."""
     with pytest.raises(ValueError):
         WordleState(
             solutions=solutions,
+            available_guesses=available_guesses,
             target="BRICK",
         )
 
@@ -84,11 +84,38 @@ def test_candidates_are_copied(
 
 
 @pytest.mark.wordle
-def test_available_values_matches_candidates(
+def test_available_guesses_are_copied(
     state: WordleState,
 ) -> None:
-    """Test that available state values are the current candidates."""
-    assert state.available_values == state.candidates
+    """Test that callers cannot mutate available guesses directly."""
+    guesses = state.available_guesses
+
+    guesses.remove("SLATE")
+
+    assert state.available_guesses == {
+        "CRANE",
+        "STAIN",
+        "PLANE",
+        "SLATE",
+    }
+
+
+@pytest.mark.wordle
+def test_available_guesses_are_distinct_from_candidates(
+    state: WordleState,
+) -> None:
+    """Test that legal guesses are independent of solution candidates."""
+    assert state.available_guesses == {
+        "CRANE",
+        "STAIN",
+        "PLANE",
+        "SLATE",
+    }
+    assert state.candidates == {
+        "CRANE",
+        "STAIN",
+        "PLANE",
+    }
 
 
 @pytest.mark.wordle
@@ -170,6 +197,7 @@ def test_matches_information_accepts_matching_word() -> None:
     """Test that a word satisfying all constraints is accepted."""
     state = WordleState(
         solutions={"CRANE", "CRATE", "GRAPE"},
+        available_guesses={"CRANE", "CRATE", "GRAPE"},
         target="CRANE",
     )
 
@@ -193,6 +221,7 @@ def test_matches_information_rejects_wrong_required_position() -> None:
     """Test that a word violating a required position is rejected."""
     state = WordleState(
         solutions={"CRANE"},
+        available_guesses={"CRANE"},
         target="CRANE",
     )
 
@@ -212,6 +241,7 @@ def test_matches_information_rejects_excluded_position() -> None:
     """Test that a word containing an excluded letter at a position is rejected."""
     state = WordleState(
         solutions={"CRANE"},
+        available_guesses={"CRANE"},
         target="CRANE",
     )
 
@@ -231,6 +261,7 @@ def test_matches_information_enforces_minimum_count() -> None:
     """Test that the minimum letter count is enforced."""
     state = WordleState(
         solutions={"CRANE"},
+        available_guesses={"CRANE"},
         target="CRANE",
     )
 
@@ -250,6 +281,7 @@ def test_matches_information_enforces_maximum_count() -> None:
     """Test that the maximum letter count is enforced."""
     state = WordleState(
         solutions={"SHEEP"},
+        available_guesses={"SHEEP"},
         target="SHEEP",
     )
 
@@ -269,6 +301,7 @@ def test_matches_information_accepts_unbounded_maximum() -> None:
     """Test that an unbounded maximum allows additional occurrences."""
     state = WordleState(
         solutions={"SHEEP"},
+        available_guesses={"SHEEP"},
         target="SHEEP",
     )
 
@@ -286,7 +319,11 @@ def test_matches_information_accepts_unbounded_maximum() -> None:
 @pytest.mark.wordle
 def test_initial_state_is_not_terminal() -> None:
     """A newly initialized state should not be terminal."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
 
     assert not state.is_terminal
 
@@ -294,7 +331,11 @@ def test_initial_state_is_not_terminal() -> None:
 @pytest.mark.wordle
 def test_state_is_terminal_when_target_is_guessed() -> None:
     """A state should be terminal when the target has been guessed."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
 
     state.update(("CRANE", feedback("CRANE", "CRANE")))
 
@@ -304,10 +345,13 @@ def test_state_is_terminal_when_target_is_guessed() -> None:
 @pytest.mark.wordle
 def test_state_is_not_terminal_after_fewer_than_six_incorrect_guesses() -> None:
     """An incorrect guess before the sixth guess should not be terminal."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
 
-    for guess in ["PLANE"]:
-        state.update((guess, feedback("CRANE", guess)))
+    state.update(("PLANE", feedback("CRANE", "PLANE")))
 
     assert not state.is_terminal
 
@@ -315,7 +359,11 @@ def test_state_is_not_terminal_after_fewer_than_six_incorrect_guesses() -> None:
 @pytest.mark.wordle
 def test_state_is_terminal_after_six_guesses() -> None:
     """A state should be terminal after six guesses."""
-    state = WordleState({"CRANE", "PLANE"}, "CRANE")
+    state = WordleState(
+        solutions={"CRANE", "PLANE"},
+        available_guesses={"CRANE", "PLANE"},
+        target="CRANE",
+    )
 
     for guess in ["PLANE"] * 6:
         state.update((guess, feedback("CRANE", guess)))

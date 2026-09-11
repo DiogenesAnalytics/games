@@ -26,12 +26,14 @@ class WordleState(State):
     def __init__(
         self,
         solutions: Set[str],
+        available_guesses: Set[str],
         target: str,
     ) -> None:
         """Initialize a Wordle game state.
 
         Args:
             solutions: Complete set of valid Wordle solution words.
+            available_guesses: Complete set of words that may be guessed.
             target: Hidden solution word.
 
         Raises:
@@ -41,6 +43,7 @@ class WordleState(State):
         super().__init__()
 
         self._solutions = {word.upper() for word in solutions}
+        self._available_guesses = {word.upper() for word in available_guesses}
 
         self._target = target.upper()
 
@@ -94,6 +97,16 @@ class WordleState(State):
         return set(self._solutions)
 
     @property
+    def available_guesses(self) -> Set[str]:
+        """Return all words that may legally be guessed."""
+        return set(self._available_guesses)
+
+    @property
+    def available_values(self) -> Set[str]:
+        """Return the words currently available as legal guesses."""
+        return self.available_guesses
+
+    @property
     def target(self) -> str:
         """Return the hidden solution word."""
         return self._target
@@ -112,11 +125,6 @@ class WordleState(State):
     def feedback(self) -> List[Feedback]:
         """Return the feedback produced by previous guesses."""
         return list(self._feedback)
-
-    @property
-    def available_values(self) -> Set[str]:
-        """Return the currently possible solution words."""
-        return set(self._candidates)
 
     def reset(self) -> None:
         """Reset the game to its initial information state."""

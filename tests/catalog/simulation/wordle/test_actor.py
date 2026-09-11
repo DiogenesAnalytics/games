@@ -1,4 +1,4 @@
-"""Tests for module games.catalog.simulation.wordle.player."""
+"""Tests for module games.catalog.simulation.wordle.actor."""
 
 import pytest
 

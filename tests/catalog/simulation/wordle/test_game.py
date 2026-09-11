@@ -1,5 +1,7 @@
 """Tests for module games.catalog.simulation.wordle.game."""
 
+from typing import Set
+
 import pytest
 
 from games.catalog.simulation.wordle.action import WordleGuess
@@ -29,10 +31,15 @@ def player() -> WordleTestPlayer:
 
 
 @pytest.fixture
-def game(player: WordleTestPlayer) -> WordleGame:
+def game(
+    player: WordleTestPlayer,
+    solutions: Set[str],
+    available_guesses: Set[str],
+) -> WordleGame:
     """Return a Wordle game for testing."""
     return WordleGame(
-        solutions={"CRANE", "PLANE"},
+        solutions=solutions,
+        available_guesses=available_guesses,
         target="CRANE",
         player=player,
     )
@@ -98,11 +105,14 @@ def test_wordle_game_step_applies_valid_guess(
 
 
 @pytest.mark.wordle
-def test_wordle_game_step_rejects_invalid_guess() -> None:
+def test_wordle_game_step_rejects_invalid_guess(
+    available_guesses: Set[str],
+) -> None:
     """An invalid player guess should not update the Wordle state."""
     player = WordleTestPlayer("XXXXX")
     game = WordleGame(
         solutions={"CRANE", "PLANE"},
+        available_guesses=available_guesses,
         target="CRANE",
         player=player,
     )

@@ -42,7 +42,7 @@ class WordleGuessValidationRule(ValidationRule):
         assert isinstance(action, WordleGuess)
         assert isinstance(state, WordleState)
 
-        return action.word in state.available_values
+        return action.word in state.available_guesses
 
 
 class WordleGuessExecutorRule(ExecutorRule):
