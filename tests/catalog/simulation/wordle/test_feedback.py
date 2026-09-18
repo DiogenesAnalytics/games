@@ -305,3 +305,19 @@ def test_interpret_feedback_must_have_five_tiles() -> None:
                 FeedbackTile.GRAY,
             ),
         )
+
+
+@pytest.mark.wordle
+def test_interpret_feedback_rejects_invalid_tile() -> None:
+    """Test that interpretation rejects an invalid feedback tile."""
+    with pytest.raises(ValueError):
+        interpret_feedback(
+            "CRANE",
+            (
+                FeedbackTile.GREEN,
+                FeedbackTile.YELLOW,
+                FeedbackTile.GRAY,
+                FeedbackTile.GRAY,
+                "invalid",  # type: ignore[arg-type]
+            ),
+        )

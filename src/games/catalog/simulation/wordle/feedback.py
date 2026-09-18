@@ -153,14 +153,14 @@ def interpret_feedback(
         minimum = positive_counts.get(letter, 0)
 
         if letter in gray_counts:
-            maximum = minimum
-        else:
-            maximum = None
-
-        if minimum > 0 or maximum == 0:
             counts[letter] = CountConstraint(
                 minimum=minimum,
-                maximum=maximum,
+                maximum=minimum,
+            )
+        else:
+            counts[letter] = CountConstraint(
+                minimum=minimum,
+                maximum=None,
             )
 
     return FeedbackInformation(

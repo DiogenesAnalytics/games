@@ -369,3 +369,11 @@ def test_state_is_terminal_after_six_guesses() -> None:
         state.update((guess, feedback("CRANE", guess)))
 
     assert state.is_terminal
+
+
+@pytest.mark.wordle
+def test_available_values_matches_available_guesses(
+    state: WordleState,
+) -> None:
+    """Test that available values expose legal Wordle guesses."""
+    assert state.available_values == state.available_guesses

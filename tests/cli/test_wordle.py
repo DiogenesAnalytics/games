@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
+from games.cli.wordle import _select_target
 from games.cli.wordle import wordle
 
 
@@ -61,3 +62,12 @@ def test_wordle_rejects_invalid_guess() -> None:
     assert result.exit_code == 0
     assert "Invalid guess. Please try again." in result.output
     assert "You got it in 1 guesses!" in result.output
+
+
+@pytest.mark.cli
+@pytest.mark.wordle
+def test_select_target_returns_answer() -> None:
+    """Test that target selection returns an available answer."""
+    answers = {"CRANE", "STAIN", "PLANE"}
+
+    assert _select_target(answers) in answers
