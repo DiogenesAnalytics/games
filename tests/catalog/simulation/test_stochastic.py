@@ -69,3 +69,41 @@ def test_carddraw_deck_completeness() -> None:
     sim = CardDraw()
     assert len(sim.states[0].available_values) == 52
     assert len(set(sim.states[0].available_values)) == 52
+
+
+@pytest.mark.simulation
+def test_coinflip_is_not_done() -> None:
+    """Test that a coin flip simulation is not terminal."""
+    sim = CoinFlip()
+
+    assert not sim.is_done()
+
+
+@pytest.mark.simulation
+def test_diceroll_is_not_done() -> None:
+    """Test that a dice roll simulation is not terminal."""
+    sim = DiceRoll()
+
+    assert not sim.is_done()
+
+
+@pytest.mark.simulation
+def test_carddraw_is_not_done() -> None:
+    """Test that a card draw simulation is not terminal."""
+    sim = CardDraw()
+
+    assert not sim.is_done()
+
+
+@pytest.mark.simulation
+def test_diceroll_requires_at_least_one_die() -> None:
+    """Test that a dice roll requires at least one die."""
+    with pytest.raises(ValueError, match="at least one die"):
+        DiceRoll(num_dice=0)
+
+
+@pytest.mark.simulation
+def test_diceroll_requires_at_least_three_sides() -> None:
+    """Test that a die requires at least three sides."""
+    with pytest.raises(ValueError, match="at least 3 sides"):
+        DiceRoll(num_sides=2)
