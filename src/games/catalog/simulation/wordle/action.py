@@ -17,7 +17,7 @@ class WordleGuess(Action):
     def __init__(self, word: str) -> None:
         """Initialize the Wordle guess with a proposed word."""
         super().__init__()
-        self.word = word
+        self.word = word.upper()
 
     def describe(self) -> str:
         """Return a human-readable description of the proposed guess."""

@@ -74,3 +74,11 @@ def test_wordle_guess_can_be_invalidated() -> None:
     assert not guess.is_valid
     assert not guess.is_resolved
     assert guess.executor is None
+
+
+@pytest.mark.wordle
+def test_wordle_guess_normalizes_word() -> None:
+    """A Wordle guess should normalize its word to uppercase."""
+    action = WordleGuess("slate")
+
+    assert action.word == "SLATE"
