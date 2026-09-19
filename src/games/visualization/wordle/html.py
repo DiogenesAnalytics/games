@@ -30,12 +30,11 @@ class HtmlWordleRenderer:
             state.feedback,
             strict=True,
         ):
-            rows.append(
-                "".join(
-                    self._render_tile(letter, tile)
-                    for letter, tile in zip(guess, result, strict=True)
-                )
+            tiles = "".join(
+                self._render_tile(letter, tile)
+                for letter, tile in zip(guess, result, strict=True)
             )
+            rows.append(self._render_row(tiles))
 
         while len(rows) < 6:
             rows.append(self._render_empty_row())
@@ -79,7 +78,30 @@ class HtmlWordleRenderer:
         Returns:
             An HTML row containing five empty tiles.
         """
-        return "".join(self._render_letter_tile("", self._EMPTY_TILE) for _ in range(5))
+        tiles = "".join(
+            self._render_letter_tile("", self._EMPTY_TILE) for _ in range(5)
+        )
+        return self._render_row(tiles)
+
+    @staticmethod
+    def _render_row(tiles: str) -> str:
+        """Render a row containing Wordle tiles.
+
+        Args:
+            tiles: HTML for the tiles in the row.
+
+        Returns:
+            An HTML row containing the supplied tiles.
+        """
+        return (
+            '<div style="'
+            "display:flex;"
+            "flex-direction:row;"
+            "gap:4px;"
+            '">'
+            f"{tiles}"
+            "</div>"
+        )
 
     @staticmethod
     def _render_letter_tile(
@@ -89,8 +111,8 @@ class HtmlWordleRenderer:
         """Render a single HTML tile.
 
         Args:
-            letter: Letter to display.
-            background: Tile background color.
+            letter: Letter to display in the tile.
+            background: Background color for the tile.
 
         Returns:
             An HTML element representing the tile.

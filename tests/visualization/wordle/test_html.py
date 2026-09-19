@@ -16,6 +16,7 @@ def test_render_empty_state(wordle_state: WordleState) -> None:
     result = renderer.render(wordle_state)
 
     assert result.count("#d3d6da") == 30
+    assert result.count("flex-direction:row;") == 6
 
 
 @pytest.mark.renderer
@@ -85,3 +86,18 @@ def test_render_multiple_guesses(wordle_state: WordleState) -> None:
 
     assert result.index("S") < result.index("C")
     assert result.count("#d3d6da") == 20
+    assert result.count("flex-direction:row;") == 6
+
+
+@pytest.mark.renderer
+@pytest.mark.wordle
+def test_render_board_structure(
+    wordle_state: WordleState,
+) -> None:
+    """Render six rows containing thirty tiles."""
+    renderer = HtmlWordleRenderer()
+
+    result = renderer.render(wordle_state)
+
+    assert result.count("width:40px;") == 30
+    assert result.count("flex-direction:row;") == 6
