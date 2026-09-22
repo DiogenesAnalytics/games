@@ -2,35 +2,17 @@
 
 import pytest
 
-from games.catalog.simulation.wordle.feedback import FeedbackTile
 from games.catalog.simulation.wordle.state import WordleState
 from games.visualization.wordle.renderer import WordleRenderer
 
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_text() -> None:
+def test_render_text(wordle_state: WordleState) -> None:
     """Render a Wordle state as text."""
-    state = WordleState(
-        solutions={"CRANE", "PLANE"},
-        available_guesses={"CRANE", "PLANE"},
-        target="CRANE",
-    )
-    state.update(
-        (
-            "PLANE",
-            (
-                FeedbackTile.GRAY,
-                FeedbackTile.GRAY,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-            ),
-        )
-    )
     renderer = WordleRenderer()
 
-    result = renderer.render_text(state)
+    result = renderer.render_text(wordle_state)
 
     expected = "\n".join(
         [
@@ -48,28 +30,11 @@ def test_render_text() -> None:
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_html() -> None:
+def test_render_html(wordle_state: WordleState) -> None:
     """Render a Wordle state as HTML."""
-    state = WordleState(
-        solutions={"CRANE", "PLANE"},
-        available_guesses={"CRANE", "PLANE"},
-        target="CRANE",
-    )
-    state.update(
-        (
-            "PLANE",
-            (
-                FeedbackTile.GRAY,
-                FeedbackTile.GRAY,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-            ),
-        )
-    )
     renderer = WordleRenderer()
 
-    result = renderer.render_html(state)
+    result = renderer.render_html(wordle_state)
 
     assert "P" in result
     assert "L" in result
@@ -82,28 +47,11 @@ def test_render_html() -> None:
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_image() -> None:
+def test_render_image(wordle_state: WordleState) -> None:
     """Render a Wordle state as an SVG image."""
-    state = WordleState(
-        solutions={"CRANE", "PLANE"},
-        available_guesses={"CRANE", "PLANE"},
-        target="CRANE",
-    )
-    state.update(
-        (
-            "PLANE",
-            (
-                FeedbackTile.GRAY,
-                FeedbackTile.GRAY,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-            ),
-        )
-    )
     renderer = WordleRenderer()
 
-    result = renderer.render_image(state)
+    result = renderer.render_image(wordle_state)
 
     assert result.startswith(b"<svg")
     assert result.endswith(b"</svg>")
@@ -114,18 +62,15 @@ def test_render_image() -> None:
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_empty_state() -> None:
+def test_render_empty_state(
+    empty_wordle_state: WordleState,
+) -> None:
     """Render an empty Wordle state through each representation."""
-    state = WordleState(
-        solutions={"CRANE"},
-        available_guesses={"CRANE"},
-        target="CRANE",
-    )
     renderer = WordleRenderer()
 
-    text = renderer.render_text(state)
-    html = renderer.render_html(state)
-    image = renderer.render_image(state)
+    text = renderer.render_text(empty_wordle_state)
+    html = renderer.render_html(empty_wordle_state)
+    image = renderer.render_image(empty_wordle_state)
 
     assert text == "\n".join(["⬜⬜⬜⬜⬜"] * 6)
     assert html.count("#d3d6da") == 30
@@ -134,35 +79,20 @@ def test_render_empty_state() -> None:
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_does_not_modify_state() -> None:
+def test_render_does_not_modify_state(
+    wordle_state: WordleState,
+) -> None:
     """Rendering should not modify the Wordle state."""
-    state = WordleState(
-        solutions={"CRANE", "PLANE"},
-        available_guesses={"CRANE", "PLANE"},
-        target="CRANE",
-    )
-    state.update(
-        (
-            "PLANE",
-            (
-                FeedbackTile.GRAY,
-                FeedbackTile.GRAY,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-                FeedbackTile.GREEN,
-            ),
-        )
-    )
     renderer = WordleRenderer()
 
-    guesses = state.guesses
-    feedback = state.feedback
-    candidates = state.candidates
+    guesses = wordle_state.guesses
+    feedback = wordle_state.feedback
+    candidates = wordle_state.candidates
 
-    renderer.render_text(state)
-    renderer.render_html(state)
-    renderer.render_image(state)
+    renderer.render_text(wordle_state)
+    renderer.render_html(wordle_state)
+    renderer.render_image(wordle_state)
 
-    assert state.guesses == guesses
-    assert state.feedback == feedback
-    assert state.candidates == candidates
+    assert wordle_state.guesses == guesses
+    assert wordle_state.feedback == feedback
+    assert wordle_state.candidates == candidates
