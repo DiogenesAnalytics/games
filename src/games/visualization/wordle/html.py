@@ -1,43 +1,34 @@
-"""Defines HTML rendering for the Wordle simulation."""
+"""Defines HTML rendering for the Wordle board."""
 
 from typing import List
 
 from games.catalog.simulation.wordle.feedback import FeedbackTile
-from games.catalog.simulation.wordle.state import WordleState
+from games.visualization.wordle.board import WordleBoard
+from games.visualization.wordle.board import WordleCell
 
 
-class HtmlWordleRenderer:
-    """Render a Wordle game state as HTML."""
+class HtmlRenderer:
+    """Render a Wordle board as HTML."""
 
     _EMPTY_TILE = "#d3d6da"
     _GREEN_TILE = "#6aaa64"
     _YELLOW_TILE = "#c9b458"
     _GRAY_TILE = "#787c7e"
 
-    def render(self, state: WordleState) -> str:
-        """Render the current Wordle board.
+    def render(self, board: WordleBoard) -> str:
+        """Render a Wordle board.
 
         Args:
-            state: Wordle game state to render.
+            board: Wordle board to render.
 
         Returns:
-            A string containing the current Wordle board as HTML.
+            A string containing the Wordle board as HTML.
         """
         rows: List[str] = []
 
-        for guess, result in zip(
-            state.guesses,
-            state.feedback,
-            strict=True,
-        ):
-            tiles = "".join(
-                self._render_tile(letter, tile)
-                for letter, tile in zip(guess, result, strict=True)
-            )
+        for row in board.rows:
+            tiles = "".join(self._render_tile(cell) for cell in row)
             rows.append(self._render_row(tiles))
-
-        while len(rows) < 6:
-            rows.append(self._render_empty_row())
 
         return (
             '<div style="'
@@ -49,39 +40,28 @@ class HtmlWordleRenderer:
             "</div>"
         )
 
-    def _render_tile(
-        self,
-        letter: str,
-        tile: FeedbackTile,
-    ) -> str:
-        """Render a single Wordle tile.
+    def _render_tile(self, cell: WordleCell) -> str:
+        """Render a single HTML tile.
 
         Args:
-            letter: Letter displayed in the tile.
-            tile: Feedback classification for the letter.
+            cell: Board cell to render.
 
         Returns:
             An HTML element representing the tile.
         """
-        if tile is FeedbackTile.GREEN:
+        if cell.feedback is FeedbackTile.GREEN:
             background = self._GREEN_TILE
-        elif tile is FeedbackTile.YELLOW:
+        elif cell.feedback is FeedbackTile.YELLOW:
             background = self._YELLOW_TILE
-        else:
+        elif cell.feedback is FeedbackTile.GRAY:
             background = self._GRAY_TILE
+        else:
+            background = self._EMPTY_TILE
 
-        return self._render_letter_tile(letter, background)
-
-    def _render_empty_row(self) -> str:
-        """Render an empty Wordle row.
-
-        Returns:
-            An HTML row containing five empty tiles.
-        """
-        tiles = "".join(
-            self._render_letter_tile("", self._EMPTY_TILE) for _ in range(5)
+        return self._render_letter_tile(
+            cell.letter or "",
+            background,
         )
-        return self._render_row(tiles)
 
     @staticmethod
     def _render_row(tiles: str) -> str:

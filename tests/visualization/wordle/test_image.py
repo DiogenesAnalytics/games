@@ -1,11 +1,11 @@
-"""Tests for the Wordle HTML renderer."""
+"""Tests for the Wordle image renderer."""
 
 import pytest
 
 from games.catalog.simulation.wordle.feedback import FeedbackTile
 from games.visualization.wordle.board import WordleBoard
 from games.visualization.wordle.board import WordleCell
-from games.visualization.wordle.html import HtmlRenderer
+from games.visualization.wordle.image import ImageRenderer
 
 
 @pytest.mark.renderer
@@ -13,19 +13,21 @@ from games.visualization.wordle.html import HtmlRenderer
 def test_render_empty_board(
     empty_wordle_board: WordleBoard,
 ) -> None:
-    """Render six empty rows for an empty board."""
-    renderer = HtmlRenderer()
+    """Render an empty Wordle board as SVG."""
+    renderer = ImageRenderer()
 
     result = renderer.render(empty_wordle_board)
 
-    assert result.count("#d3d6da") == 30
-    assert result.count("flex-direction:row;") == 6
+    assert result.startswith(b"<svg")
+    assert result.endswith(b"</svg>")
+    assert result.count(b"<rect") == 30
+    assert result.count(b"#d3d6da") == 30
 
 
 @pytest.mark.renderer
 @pytest.mark.wordle
 def test_render_feedback_tiles() -> None:
-    """Render letters with their feedback colors."""
+    """Render feedback tiles with their corresponding colors."""
     board = WordleBoard(
         (
             (
@@ -37,25 +39,26 @@ def test_render_feedback_tiles() -> None:
             ),
         )
     )
-    renderer = HtmlRenderer()
+
+    renderer = ImageRenderer()
 
     result = renderer.render(board)
 
-    assert "S" in result
-    assert "L" in result
-    assert "A" in result
-    assert "T" in result
-    assert "E" in result
+    assert b">S<" in result
+    assert b">L<" in result
+    assert b">A<" in result
+    assert b">T<" in result
+    assert b">E<" in result
 
-    assert "#787c7e" in result
-    assert "#c9b458" in result
-    assert "#6aaa64" in result
+    assert b"#787c7e" in result
+    assert b"#c9b458" in result
+    assert b"#6aaa64" in result
 
 
 @pytest.mark.renderer
 @pytest.mark.wordle
 def test_render_multiple_rows() -> None:
-    """Render multiple rows in their existing order."""
+    """Render multiple board rows in their existing order."""
     board = WordleBoard(
         (
             (
@@ -74,24 +77,23 @@ def test_render_multiple_rows() -> None:
             ),
         )
     )
-    renderer = HtmlRenderer()
+
+    renderer = ImageRenderer()
 
     result = renderer.render(board)
 
-    assert result.index("S") < result.index("C")
-    assert result.count("#d3d6da") == 0
-    assert result.count("flex-direction:row;") == 2
+    assert result.index(b">S<") < result.index(b">C<")
+    assert result.count(b"<rect") == 10
+    assert result.count(b"#d3d6da") == 0
 
 
 @pytest.mark.renderer
 @pytest.mark.wordle
-def test_render_board_structure(
+def test_render_unsupported_format(
     empty_wordle_board: WordleBoard,
 ) -> None:
-    """Render the rows and tiles supplied by the board."""
-    renderer = HtmlRenderer()
+    """Reject unsupported image formats."""
+    renderer = ImageRenderer()
 
-    result = renderer.render(empty_wordle_board)
-
-    assert result.count("width:40px;") == 30
-    assert result.count("flex-direction:row;") == 6
+    with pytest.raises(ValueError, match="Unsupported image format"):
+        renderer.render(empty_wordle_board, "png")

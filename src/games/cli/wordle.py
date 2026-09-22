@@ -9,7 +9,7 @@ from games.catalog.simulation.wordle.actor import InteractiveWordlePlayer
 from games.catalog.simulation.wordle.game import WordleGame
 from games.catalog.simulation.wordle.words import load_answers
 from games.catalog.simulation.wordle.words import load_words
-from games.visualization.wordle.terminal import TerminalWordleRenderer
+from games.visualization.wordle.renderer import WordleRenderer
 
 
 def _select_target(answers: Set[str]) -> str:
@@ -32,7 +32,7 @@ def wordle() -> None:
         target=target,
         player=player,
     )
-    renderer = TerminalWordleRenderer()
+    renderer = WordleRenderer()
 
     while not game.is_done():
         try:
@@ -41,7 +41,7 @@ def wordle() -> None:
             click.echo("Invalid guess. Please try again.")
             continue
 
-        click.echo(renderer.render(game.state))
+        click.echo(renderer.render_text(game.state))
 
     if game.state.target in game.state.guesses:
         click.echo(f"You got it in {len(game.state.guesses)} guesses!")
