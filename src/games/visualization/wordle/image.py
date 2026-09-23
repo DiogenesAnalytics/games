@@ -65,7 +65,7 @@ class ImageRenderer:
 
         svg = (
             '<svg xmlns="http://www.w3.org/2000/svg" '
-            f"width={width!r} height={height!r} "
+            f"width={str(width)!r} height={str(height)!r} "
             f'viewBox="0 0 {width} {height}">'
             f"{''.join(elements)}"
             "</svg>"
@@ -86,10 +86,11 @@ class ImageRenderer:
         letter = cell.letter or ""
 
         return (
-            f"<rect x={x!r} y={y!r} "
-            f"width={size!r} height={size!r} "
+            f"<rect x={str(x)!r} y={str(y)!r} "
+            f"width={str(size)!r} height={str(size)!r} "
             f"fill={background!r}/>"
-            f"<text x={(x + size / 2)!r} y={(y + size / 2)!r} "
+            f"<text x={str(x + size / 2)!r} "
+            f"y={str(y + size / 2)!r} "
             'text-anchor="middle" dominant-baseline="central" '
             'fill="white" font-family="monospace" '
             'font-size="18" font-weight="bold">'

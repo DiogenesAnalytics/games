@@ -1,5 +1,7 @@
 """Tests for the Wordle image renderer."""
 
+from xml.dom import minidom
+
 import pytest
 
 from games.catalog.simulation.wordle.feedback import FeedbackTile
@@ -17,6 +19,8 @@ def test_render_empty_board(
     renderer = ImageRenderer()
 
     result = renderer.render(empty_wordle_board)
+
+    minidom.parseString(result)
 
     assert result.startswith(b"<svg")
     assert result.endswith(b"</svg>")
