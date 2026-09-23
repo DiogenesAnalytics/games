@@ -1,11 +1,8 @@
 """Defines Wordle rendering."""
 
-from typing import List
-
 from games.catalog.simulation.wordle.state import WordleState
 from games.visualization.wordle.board import WordleBoard
-from games.visualization.wordle.board import WordleCell
-from games.visualization.wordle.board import WordleRow
+from games.visualization.wordle.board import create_wordle_board
 from games.visualization.wordle.html import HtmlRenderer
 from games.visualization.wordle.image import ImageRenderer
 from games.visualization.wordle.text import TextRenderer
@@ -42,25 +39,7 @@ class WordleRenderer:
     @staticmethod
     def _create_board(state: WordleState) -> WordleBoard:
         """Create a visual board from a Wordle state."""
-        rows: List[WordleRow] = []
-
-        for guess, result in zip(
+        return create_wordle_board(
             state.guesses,
             state.feedback,
-            strict=True,
-        ):
-            rows.append(
-                tuple(
-                    WordleCell(letter, tile)
-                    for letter, tile in zip(
-                        guess,
-                        result,
-                        strict=True,
-                    )
-                )
-            )
-
-        while len(rows) < 6:
-            rows.append(tuple(WordleCell(None, None) for _ in range(5)))
-
-        return WordleBoard(tuple(rows))
+        )
