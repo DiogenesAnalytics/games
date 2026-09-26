@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
+from games.cli.wordle import _random_colors
 from games.cli.wordle import _select_target
 from games.cli.wordle import wordle
 
@@ -71,3 +72,21 @@ def test_select_target_returns_answer() -> None:
     answers = {"CRANE", "STAIN", "PLANE"}
 
     assert _select_target(answers) in answers
+
+
+@pytest.mark.cli
+@pytest.mark.wordle
+def test_random_colors_preserves_colors() -> None:
+    """Test that random colors preserves the input colors."""
+    colors = [
+        "#6CA965",
+        "#6CA965",
+        "#C8B653",
+        "#C8B653",
+        "#787C7F",
+        "#787C7F",
+    ]
+
+    result = _random_colors(colors)
+
+    assert sorted(result) == sorted(colors)

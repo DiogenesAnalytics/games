@@ -23,8 +23,11 @@ def _configure_terminal() -> None:
     os.environ.setdefault("COLORTERM", "truecolor")
 
 
-_configure_terminal()
-console = Console()
+def _random_colors(colors: List[str]) -> List[str]:
+    """Return colors in random order."""
+    colors = colors.copy()
+    random.shuffle(colors)
+    return colors
 
 
 def _select_target(answers: Set[str]) -> str:
@@ -34,15 +37,19 @@ def _select_target(answers: Set[str]) -> str:
 
 def _print_banner() -> None:
     """Print the Wordle banner."""
-    colors: List[str] = [
-        "#6CA965",
-        "#6CA965",
-        "#C8B653",
-        "#C8B653",
-        "#787C7F",
-        "#787C7F",
-    ]
-    random.shuffle(colors)
+    _configure_terminal()
+    console = Console()
+
+    colors = _random_colors(
+        [
+            "#6CA965",
+            "#6CA965",
+            "#C8B653",
+            "#C8B653",
+            "#787C7F",
+            "#787C7F",
+        ]
+    )
 
     letters: Tuple[Tuple[str, str], ...] = tuple(
         zip(
@@ -73,7 +80,11 @@ def _print_banner() -> None:
         text = Text()
         position = 0
 
-        for (_, color), width in zip(letters, glyph_widths, strict=True):
+        for (_, color), width in zip(
+            letters,
+            glyph_widths,
+            strict=True,
+        ):
             text.append(
                 line[position : position + width],
                 style=color,
@@ -107,12 +118,12 @@ def wordle() -> None:
         try:
             game.step()
         except RuntimeError:
-            console.print("Invalid guess. Please try again.")
+            click.echo("Invalid guess. Please try again.")
             continue
 
-        console.print(renderer.render_text(game.state))
+        click.echo(renderer.render_text(game.state))
 
     if game.state.target in game.state.guesses:
-        console.print(f"You got it in {len(game.state.guesses)} guesses!")
+        click.echo(f"You got it in {len(game.state.guesses)} guesses!")
     else:
-        console.print(f"The word was {game.state.target}.")
+        click.echo(f"The word was {game.state.target}.")
