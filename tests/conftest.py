@@ -29,6 +29,7 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "scene: scene tests")
     config.addinivalue_line("markers", "wordle: wordle game tests")
     config.addinivalue_line("markers", "cli: game cli tests")
+    config.addinivalue_line("markers", "analysis: game analysis tests")
 
 
 class MockAction(Action):
